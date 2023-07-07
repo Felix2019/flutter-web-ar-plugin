@@ -1,18 +1,13 @@
 import 'dart:html';
-import 'dart:js';
 import 'dart:js_util';
-import 'package:flutter_gl/flutter_gl.dart';
+import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'package:flutter_web_xr/test.dart';
 import 'package:flutter_web_xr/three_manager.dart';
-import 'package:js/js.dart' as js;
-import 'package:three_dart/three_dart.dart' as three;
-
 import 'package:flutter/material.dart';
-import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'dart:html' as html;
 import 'dart:ui' as ui;
 
-import '../web_xr_manager.dart';
+import 'package:flutter_web_xr/web_xr_manager.dart';
 
 class MyCanvasTest extends StatefulWidget {
   const MyCanvasTest({super.key});
@@ -22,88 +17,105 @@ class MyCanvasTest extends StatefulWidget {
 }
 
 class _MyCanvasTestState extends State<MyCanvasTest> {
-  // final html.CanvasElement canvas = html.CanvasElement()
-  //   ..style.backgroundColor = 'red'
-  //   ..style.width = '100%'
-  //   ..style.height = '100%';
+  final html.CanvasElement canvas1 = html.CanvasElement()
+    ..style.width = '100%'
+    ..style.height = '100%'
+    ..style.backgroundColor = 'blue';
 
-  late WebGLRenderer nativeRenderer;
-  late Scene scene1;
-  late PerspectiveCamera camera1;
-  late Mesh cube1;
+  final html.DivElement container = html.DivElement()
+    ..style.width = '100%'
+    ..style.height = '100%'
+    ..style.backgroundColor = 'red';
 
-  
-  
+  late WebGLRenderer renderer;
+  late Scene scene;
+  late PerspectiveCamera camera;
+  late Mesh cube;
 
-
-
-
-  String createdViewId = 'webgl_canvas';
+  String createdViewId = 'div';
   late Object? gl;
   late Object? xrSession;
-
-
 
   @override
   void initState() {
     super.initState();
-    registerCanvas();
+    registerDiv();
 
-    Map<String, dynamic> options = {
-      "width": 200,
-      "height": 200,
-      // "gl": three3dRender.gl,
-      "gl": gl!,
-      "antialias": true,
-      // "canvas": three3dRender.element
-      // "canvas": canvas
-    };
+    initRenderer();
+    initScene();
+    initCamera();
 
-    // test1(options);
+    addElement();
 
-    nativeRenderer = WebGLRenderer();
-
-    scene1 = Scene();
-    camera1 = PerspectiveCamera(
-        75, window.innerWidth! / window.innerHeight!, 0.1, 1000);
-    camera1.position.z = 5;
-
-
-    // callMethod(nativeRenderer, 'setSize', [800, 600]);
-    // Setzen Sie die Größe des Renderers auf die Größe des Canvas-Elements
-    nativeRenderer.setSize(
-        window.innerWidth!.toDouble(), window.innerHeight!.toDouble());
-
-    // Fügen Sie den Renderer zum DOM hinzu
-    html.document.body!.append(nativeRenderer.domElement);
-    // html.document.body!.append(canvas);
-
-    test1(nativeRenderer);
-    test1(nativeRenderer.domElement);
-    print(nativeRenderer);
-
-
-    // renderNative();
-    animate1(2);
+    startXRSession();
+    render();
   }
 
-  void animate1(num time) {
-    window.requestAnimationFrame(allowInterop(animate1));
-
-    // Rendere die Szene mit der Kamera
-    nativeRenderer.render(scene1, camera1);
-  }
-
-  
-
-  void registerCanvas() {
-    // Ensure the canvas is ready before we try to use it
+  void registerDiv() {
+    // Register div as a view and ensure the div is ready before we try to use it
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry
-        .registerViewFactory('webgl_canvas', (int viewId) => canvas);
+        .registerViewFactory(createdViewId, (int viewId) => canvas1);
+    // ui.platformViewRegistry
+    //     .registerViewFactory(createdViewId, (int viewId) => container);
+  }
 
-    // create a webgl context
-    gl = canvas.getContext('webgl', {'xrCompatible': true});
+  void initRenderer() {
+    gl = canvas1.getContext('webgl', {'xrCompatible': true});
+
+    final Object options = jsify({'context': gl, 'canvas': canvas1});
+
+    renderer = WebGLRenderer(options);
+    // Setzen Sie die Größe des Renderers auf die Größe des Canvas-Elements
+    renderer.setSize(
+        window.innerWidth!.toDouble(), window.innerHeight!.toDouble());
+
+    renderer.xr.enabled = true;
+    var controller = renderer.xr.getController(0);
+    test1(controller);
+
+    // html.CanvasElement canvas = renderer.domElement;
+    // // create a webgl2 context
+    // gl = canvas.getContext('webgl', {'xrCompatible': true});
+    // test1(gl);
+
+    // add the created canvas to the html document body
+    // container.append(canvas);
+  }
+
+  void initScene() {
+    scene = Scene();
+    scene.background = Color('pink');
+  }
+
+  void initCamera() {
+    camera = PerspectiveCamera(
+        75, window.innerWidth! / window.innerHeight!, 0.1, 1000);
+
+    camera.position.z = 250;
+    scene.add(camera);
+  }
+
+  void addElement() {
+    final geometry = BoxGeometry(75, 75, 75);
+    final material = MeshBasicMaterial(jsify({'color': 0x00ff00}));
+    cube = Mesh(geometry, material);
+    scene.add(cube);
+  }
+
+  void animate() {
+    cube.rotation.x += 0.07;
+    cube.rotation.y += 0.07;
+  }
+
+  void render() {
+    animate();
+    renderer.render(scene, camera);
+
+    // Future.delayed(Duration(seconds: 1), () {
+    //   callMethod(xrSession!, 'requestAnimationFrame', [allowInterop(render)]);
+    // });
+    // Future.delayed(const Duration(milliseconds: 40), () => render());
   }
 
   void startXRSession() {
@@ -128,9 +140,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
       startFrameHandler() {
         callMethod(session, 'requestAnimationFrame', [
           allowInterop((time, xrFrame) {
-            // initSize(context);
-            // test1(xrFrame);
-            // render();
+            render();
             startFrameHandler();
           })
         ]);
@@ -138,161 +148,15 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
 
       startFrameHandler();
     }));
-
-    // initPlatformState();
   }
-
- 
-
-
-
- 
-
- 
-
- 
-
-  renderNative() {
-    print("render");
-
-    // create a cube
-    final geometry = BoxGeometry(75, 75, 75);
-    final material = MeshBasicMaterial(jsify({'color': 0x00ff00}));
-
-    // final material = three.MeshBasicMaterial({"color": 0x00ff00});
-    var cube2 = Mesh(geometry, material);
-    callMethod(scene1, 'add', [cube2]);
-    // scene1.add(cube2);
-
-    nativeRenderer.render(scene1, camera1);
-
-    Future.delayed(const Duration(milliseconds: 40), () {
-      renderNative();
-    });
-  }
-
-  render() {
-    print("render");
-    final gl = three3dRender.gl;
-
-    renderer!.render(scene, camera);
-    gl.flush();
-
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   print("render delay");
-
-    //   renderer!.render(scene, camera);
-    //   // callMethod(xrSession!, 'requestAnimationFrame', [
-    //   //   allowInterop((time, xrFrame) {
-    //   //     if (renderer != null) {
-    //   //       print("not null");
-    //   //       renderer!.render(scene, camera);
-    //   //     }
-    //   //   })
-    //   // ]);
-    // });
-
-    // renderer!.render(scene, camera);
-    // callMethod(xrSession!, 'requestAnimationFrame', [allowInterop(render)]);
-
-    // callMethod(xrSession!, 'requestAnimationFrame', [
-    //   allowInterop((time, xrFrame) {
-    //     if (renderer != null) {
-    //       renderer!.render(scene, camera);
-    //     }
-    //   }),
-    // ]);
-    // }
-
-    // final gl = three3dRender.gl;
-    // renderer!.render(scene, camera);
-    // callMethod(xrSession!, 'requestAnimationFrame', [allowInterop(render)]);
-    // html.window.requestAnimationFrame(render());
-  }
-
-
-   Future<void> _initializeCanvas() async {
-    // Lade das Three.js-Skript
-    await ui.platformViewRegistry.registerViewFactory(
-      'webgl_canvas',
-      (int viewId) {
-        final html.CanvasElement canvas = html.CanvasElement()
-          ..style.width = '100%'
-          ..style.height = '100%';
-
-        final scriptElement = html.ScriptElement()
-          ..src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'
-          ..async = true;
-
-        canvas.context2D.fillStyle = '#000000';
-        canvas.context2D.fillRect(0, 0, canvas.width, canvas.height);
-        canvas.context2D.fillStyle = '#FFFFFF';
-        canvas.context2D.font = '20px sans-serif';
-        canvas.context2D.fillText('Loading...', 10, 30);
-
-        final divElement = html.DivElement()
-          ..style.width = '100%'
-          ..style.height = '100%';
-
-        divElement.append(scriptElement);
-        divElement.append(canvas);
-
-        return divElement;
-      },
-    );
-
-    // Lade weitere erforderliche Skripte oder führe andere Initialisierungslogik aus
-  }
-}
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        height: 200,
-        width: 200,
-        color: Colors.green,
-        child: Builder(
-          builder: (BuildContext context) {
-            // initPlatformState(context);
-
-            // return three3dRender.isInitialized
-            //     ? HtmlElementView(viewType: three3dRender.textureId!.toString())
-            //     : const SizedBox.shrink();
-
-
-
-            return FutureBuilder<void>(
-      future: _initializeCanvas(),
-      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return SizedBox(
-            width: 300, // Breite des Canvas
-            height: 300, // Höhe des Canvas
-            child: HtmlElementView(
-              viewType: 'webgl_canvas',
-            ),
-          );
-        } else {
-          return CircularProgressIndicator();
-        }
-      },
+    return Expanded(
+      child: HtmlElementView(viewType: createdViewId),
     );
-
-
-
-            // return HtmlElementView(
-            //     viewType: createdViewId,
-            //     onPlatformViewCreated: (int viewId) {
-            //       // check if canvas is ready
-            //       if (canvas != null) {
-            //         // ignore: undefined_prefixed_name
-            //         ui.platformViewRegistry.registerViewFactory(
-            //           'webgl_canvas',
-            //           (int viewId) => canvas,
-            //         );
-            //       }
-            //     });
-          },
-        ));
   }
 }
+
+
+// The XRSession has completed multiple animation frames without drawing anything to the baseLayer's framebuffer, resulting in no visible output.
