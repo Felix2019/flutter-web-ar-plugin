@@ -14,14 +14,22 @@ class Scene {
 
 @JS('PerspectiveCamera')
 class PerspectiveCamera {
-  external PerspectiveCamera(num fov, num aspect, num near, num far);
+  external PerspectiveCamera([num fov, num aspect, num near, num far]);
   external Position get position;
   external set position(Position value);
+  external set matrixAutoUpdate(bool value);
+  external void updateMatrixWorld(bool value);
+  external void updateProjectionMatrix();
+  external bool get isPerspectiveCamera;
+  external get matrix;
+  external get projectionMatrix;
+  external set quaternion(dynamic value);
 }
 
 @JS()
 class Position {
   external Position(num x, num y, num z);
+  external set position(Position value);
 
   external num get x;
   external set x(num value);
@@ -31,6 +39,8 @@ class Position {
 
   external num get z;
   external set z(num value);
+
+  external setFromMatrixPosition(dynamic xrPosition);
 }
 
 @JS()
@@ -52,6 +62,7 @@ class WebGLRenderer {
   external html.CanvasElement get domElement;
   external void render(dynamic scene, dynamic camera);
   external XR get xr;
+  external set autoClear(bool value);
   // renderer.setClearColor(0x000000, 1.0);
 }
 
@@ -69,6 +80,8 @@ class MeshBasicMaterial {
 class Mesh {
   external Mesh(dynamic geometry, dynamic material);
   external Rotation get rotation;
+  external Position get position;
+  external set position(Position value);
 }
 
 @JS()

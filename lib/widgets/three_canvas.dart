@@ -1,5 +1,6 @@
 import 'dart:html';
 import 'dart:js_util';
+import 'package:flutter_gl/openGL/opengl/OpenGLContextWeb.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'package:flutter_web_xr/test.dart';
 import 'package:flutter_web_xr/three_manager.dart';
@@ -45,10 +46,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     initScene();
     initCamera();
 
-    addElement();
-
     startXRSession();
-    render();
   }
 
   void registerDiv() {
@@ -63,16 +61,22 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
   void initRenderer() {
     gl = canvas1.getContext('webgl', {'xrCompatible': true});
 
-    final Object options = jsify({'context': gl, 'canvas': canvas1});
+    final Object options = jsify({
+      'context': gl,
+      'canvas': canvas1,
+      'alpha': true,
+      'preserveDrawingBuffer': true,
+    });
 
     renderer = WebGLRenderer(options);
-    // Setzen Sie die Größe des Renderers auf die Größe des Canvas-Elements
-    renderer.setSize(
-        window.innerWidth!.toDouble(), window.innerHeight!.toDouble());
-
+    renderer.autoClear = false;
     renderer.xr.enabled = true;
+
+    // Setzen Sie die Größe des Renderers auf die Größe des Canvas-Elements
+    // renderer.setSize(
+    //     window.innerWidth!.toDouble(), window.innerHeight!.toDouble());
+
     var controller = renderer.xr.getController(0);
-    test1(controller);
 
     // html.CanvasElement canvas = renderer.domElement;
     // // create a webgl2 context
@@ -85,21 +89,48 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
 
   void initScene() {
     scene = Scene();
-    scene.background = Color('pink');
+    // scene.background = Color('pink');
+    addElement();
   }
 
   void initCamera() {
     camera = PerspectiveCamera(
-        75, window.innerWidth! / window.innerHeight!, 0.1, 1000);
+        50, window.innerWidth! / window.innerHeight!, 0.1, 1000);
 
-    camera.position.z = 250;
+    // camera = PerspectiveCamera(
+    //     50, window.innerWidth! / window.innerHeight!, 0.1, 10);
+
+    // camera = PerspectiveCamera();
+    camera.position.x = 0;
+    camera.position.y = 2.5;
+    camera.position.z = 2.5;
+    // Position(0, 1.6, 3);
+
+    // camera.position. set( 0, 1.6, 3 );
+
     scene.add(camera);
+    // camera.matrixAutoUpdate = false;
   }
 
   void addElement() {
-    final geometry = BoxGeometry(75, 75, 75);
-    final material = MeshBasicMaterial(jsify({'color': 0x00ff00}));
-    cube = Mesh(geometry, material);
+    final materials = [
+      MeshBasicMaterial(jsify({'color': 0xff0000})),
+      MeshBasicMaterial(jsify({'color': 0x0000ff})),
+      MeshBasicMaterial(jsify({'color': 0x00ff00})),
+      MeshBasicMaterial(jsify({'color': 0xff00ff})),
+      MeshBasicMaterial(jsify({'color': 0x00ffff})),
+      MeshBasicMaterial(jsify({'color': 0xffff00}))
+    ];
+
+    final geometry = BoxGeometry(1, 1, 1);
+    cube = Mesh(geometry, materials);
+
+    // cube.position.x = 10;
+    // cube.position.y = 30;
+    // cube.position.z = 50;
+
+    cube.rotation.x += 7;
+    cube.rotation.y += 7;
     scene.add(cube);
   }
 
@@ -109,13 +140,8 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
   }
 
   void render() {
-    animate();
+    // animate();
     renderer.render(scene, camera);
-
-    // Future.delayed(Duration(seconds: 1), () {
-    //   callMethod(xrSession!, 'requestAnimationFrame', [allowInterop(render)]);
-    // });
-    // Future.delayed(const Duration(milliseconds: 40), () => render());
   }
 
   void startXRSession() {
@@ -140,8 +166,61 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
       startFrameHandler() {
         callMethod(session, 'requestAnimationFrame', [
           allowInterop((time, xrFrame) {
-            render();
             startFrameHandler();
+
+            // Bind the graphics framebuffer to the baseLayer's framebuffer.
+            final renderState = getProperty(session, 'renderState');
+            final baseLayer = getProperty(renderState, 'baseLayer');
+            final framebuffer = getProperty(baseLayer, 'framebuffer');
+
+            final num glFramebuffer = getProperty(gl!, "FRAMEBUFFER");
+            callMethod(gl!, 'bindFramebuffer', [glFramebuffer, framebuffer]);
+
+            // Retrieve the pose of the device.
+            // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
+            final pose = xrFrame.getViewerPose(xrReferenceSpace);
+
+            if (pose != null) {
+              final xrTransform = pose.transform;
+              final xrPosition = xrTransform.position;
+              final xrOrientation = xrTransform.orientation;
+
+              // test1(xrTransform);
+
+              // camera.position.x = xrPosition.x;
+              // camera.position.y = xrPosition.y;
+              // camera.position.z = xrPosition.z;
+
+              // In mobile AR, we only have one view.
+              final views = getProperty(pose, 'views');
+
+              final viewport = callMethod(baseLayer, 'getViewport', [views[0]]);
+              renderer.setSize(viewport.width, viewport.height);
+
+              // camera.quaternion = jsify([
+              //   xrOrientation.x,
+              //   xrOrientation.y,
+              //   xrOrientation.z,
+              //   xrOrientation.w
+              // ]);
+
+              // camera.quaternion = jsify([0.0, 0.0, 0.0, 1.0]);
+
+              // Use the view's transform matrix and projection matrix to configure the THREE.camera.
+              // callMethod(
+              //     camera.matrix, 'fromArray', [views[0].transform.matrix]);
+
+              // callMethod(camera.projectionMatrix, 'fromArray',
+              //     [views[0].projectionMatrix]);
+
+              // Aktualisiere die Position der Kamera basierend auf xrPosition
+              // camera.position.setFromMatrixPosition(xrPosition);
+
+              camera.updateProjectionMatrix();
+              // camera.updateMatrixWorld(true);
+
+              render();
+            }
           })
         ]);
       }
@@ -152,11 +231,9 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: HtmlElementView(viewType: createdViewId),
-    );
+    return SizedBox();
+    // return Expanded(
+    //   child: HtmlElementView(viewType: createdViewId),
+    // );
   }
 }
-
-
-// The XRSession has completed multiple animation frames without drawing anything to the baseLayer's framebuffer, resulting in no visible output.
