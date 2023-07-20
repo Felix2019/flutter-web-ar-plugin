@@ -1,6 +1,7 @@
 @JS('THREE')
 library three;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:js/js.dart';
 import 'dart:html' as html;
@@ -18,6 +19,7 @@ class PerspectiveCamera {
   external Position get position;
   external set position(Position value);
   external set matrixAutoUpdate(bool value);
+  external bool get matrixAutoUpdate;
   external void updateMatrixWorld(bool value);
   external void updateProjectionMatrix();
   external bool get isPerspectiveCamera;

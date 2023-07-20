@@ -105,7 +105,7 @@ class _HomeState extends State<Home> {
                   throw Exception(e);
                 }
               },
-              child: const Text("get battery")),
+              child: const Text("get battery level")),
           Text(battery?.level.toString() ?? 'no battery'),
           ElevatedButton(
               onPressed: () async {

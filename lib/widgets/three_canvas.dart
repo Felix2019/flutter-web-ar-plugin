@@ -1,6 +1,4 @@
-import 'dart:html';
 import 'dart:js_util';
-import 'package:flutter_gl/openGL/opengl/OpenGLContextWeb.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'package:flutter_web_xr/test.dart';
 import 'package:flutter_web_xr/three_manager.dart';
@@ -46,6 +44,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     initScene();
     initCamera();
 
+    // render();
     startXRSession();
   }
 
@@ -54,8 +53,6 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry
         .registerViewFactory(createdViewId, (int viewId) => canvas1);
-    // ui.platformViewRegistry
-    //     .registerViewFactory(createdViewId, (int viewId) => container);
   }
 
   void initRenderer() {
@@ -79,9 +76,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     var controller = renderer.xr.getController(0);
 
     // html.CanvasElement canvas = renderer.domElement;
-    // // create a webgl2 context
     // gl = canvas.getContext('webgl', {'xrCompatible': true});
-    // test1(gl);
 
     // add the created canvas to the html document body
     // container.append(canvas);
@@ -94,21 +89,23 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
   }
 
   void initCamera() {
-    camera = PerspectiveCamera(
-        50, window.innerWidth! / window.innerHeight!, 0.1, 1000);
+    // camera = PerspectiveCamera(
+    //     50, window.innerWidth! / window.innerHeight!, 0.1, 1000);
 
     // camera = PerspectiveCamera(
     //     50, window.innerWidth! / window.innerHeight!, 0.1, 10);
 
-    // camera = PerspectiveCamera();
-    camera.position.x = 0;
-    camera.position.y = 2.5;
-    camera.position.z = 2.5;
+    camera = PerspectiveCamera();
+    camera.matrixAutoUpdate = false;
+
+    // camera.position.x = 0;
+    // camera.position.y = 2.5;
+    // camera.position.z = 30;
     // Position(0, 1.6, 3);
 
     // camera.position. set( 0, 1.6, 3 );
 
-    scene.add(camera);
+    // scene.add(camera);
     // camera.matrixAutoUpdate = false;
   }
 
@@ -124,6 +121,29 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
 
     final geometry = BoxGeometry(1, 1, 1);
     cube = Mesh(geometry, materials);
+
+    const rowCount = 4;
+    const spread = 1;
+    const half = rowCount / 2;
+
+    for (var i = 0; i < rowCount; i++) {
+      for (var j = 0; j < rowCount; j++) {
+        for (var k = 0; k < rowCount; k++) {
+          final geometry = BoxGeometry(0.2, 0.2, 0.2);
+          // final geometry = BoxGeometry(1, 1, 1);
+          final box = Mesh(geometry, materials);
+
+          box.position.x = i - half;
+          box.position.y = j - half;
+          box.position.z = k - half;
+
+          // const box = new THREE.Mesh(new THREE.BoxBufferGeometry(0.2, 0.2, 0.2), materials);
+          // box.position.set(i - half, j - HALF, k - HALF);
+          // box.position.multiplyScalar(spread);
+          scene.add(box);
+        }
+      }
+    }
 
     // cube.position.x = 10;
     // cube.position.y = 30;
@@ -162,6 +182,8 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
       var xrReferenceSpace = await promiseToFuture(
           callMethod(session, 'requestReferenceSpace', [xrReferenceSpaceType]));
 
+      test1("requestReferenceSpace");
+
       // register XR-Frame-Handler
       startFrameHandler() {
         callMethod(session, 'requestAnimationFrame', [
@@ -178,14 +200,13 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
 
             // Retrieve the pose of the device.
             // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
-            final pose = xrFrame.getViewerPose(xrReferenceSpace);
+            final pose =
+                callMethod(xrFrame, 'getViewerPose', [xrReferenceSpace]);
 
             if (pose != null) {
-              final xrTransform = pose.transform;
-              final xrPosition = xrTransform.position;
-              final xrOrientation = xrTransform.orientation;
-
-              // test1(xrTransform);
+              // final xrTransform = pose.transform;
+              // final xrPosition = xrTransform.position;
+              // final xrOrientation = xrTransform.orientation;
 
               // camera.position.x = xrPosition.x;
               // camera.position.y = xrPosition.y;
@@ -194,30 +215,28 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
               // In mobile AR, we only have one view.
               final views = getProperty(pose, 'views');
 
-              final viewport = callMethod(baseLayer, 'getViewport', [views[0]]);
-              renderer.setSize(viewport.width, viewport.height);
+              final Viewport viewport =
+                  callMethod(baseLayer, 'getViewport', [views[0]]);
 
-              // camera.quaternion = jsify([
-              //   xrOrientation.x,
-              //   xrOrientation.y,
-              //   xrOrientation.z,
-              //   xrOrientation.w
-              // ]);
-
-              // camera.quaternion = jsify([0.0, 0.0, 0.0, 1.0]);
-
-              // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-              // callMethod(
-              //     camera.matrix, 'fromArray', [views[0].transform.matrix]);
-
-              // callMethod(camera.projectionMatrix, 'fromArray',
-              //     [views[0].projectionMatrix]);
+              final viewportWidth = getProperty(viewport, 'width');
+              final viewportHeight = getProperty(viewport, 'height');
+              renderer.setSize(viewportWidth, viewportHeight);
 
               // Aktualisiere die Position der Kamera basierend auf xrPosition
               // camera.position.setFromMatrixPosition(xrPosition);
 
-              camera.updateProjectionMatrix();
-              // camera.updateMatrixWorld(true);
+              // camera.updateProjectionMatrix();
+
+              final transformProperty = getProperty(views[0], 'transform');
+              final matrix = getProperty(transformProperty, 'matrix');
+
+              // Use the view's transform matrix and projection matrix to configure the THREE.camera.
+              callMethod(camera.matrix, 'fromArray', [matrix]);
+
+              callMethod(camera.projectionMatrix, 'fromArray',
+                  [views[0].projectionMatrix]);
+
+              camera.updateMatrixWorld(true);
 
               render();
             }
@@ -231,9 +250,9 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox();
-    // return Expanded(
-    //   child: HtmlElementView(viewType: createdViewId),
-    // );
+    // return const SizedBox();
+    return Expanded(
+      child: HtmlElementView(viewType: createdViewId),
+    );
   }
 }
