@@ -23,11 +23,11 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   /// Returns a [String] containing the version of the platform.
-  @override
-  Future<String?> getPlatformVersion() async {
-    final version = html.window.navigator.userAgent;
-    return version;
-  }
+  // @override
+  // Future<String?> getPlatformVersion() async {
+  //   final version = html.window.navigator.userAgent;
+  //   return version;
+  // }
 
   @override
   Future<bool> isWebXrAvailable() async {

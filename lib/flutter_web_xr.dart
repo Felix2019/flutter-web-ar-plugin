@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:flutter_web_xr/xr_session.dart';

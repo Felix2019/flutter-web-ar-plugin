@@ -3,6 +3,12 @@ library script.js;
 
 import 'package:js/js.dart';
 
+@JS()
+external String get url;
+
+@JS()
+external void createAlert(String message);
+
 // This function will do Promise to return something
 @JS()
 external dynamic jsPromiseFunction(String message);

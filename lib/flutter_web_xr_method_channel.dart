@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_web_xr/test.dart';
 
 import 'flutter_web_xr_platform_interface.dart';
 
@@ -11,8 +12,11 @@ class MethodChannelFlutterWebXr extends FlutterWebXrPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version =
-        await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version = await methodChannel.invokeMethod<String>('getBatteryLevel');
+    // final version =
+    //     await methodChannel.invokeMethod<String>('getPlatformVersion');
+    test1(version);
+    print(version);
     return version;
   }
 }

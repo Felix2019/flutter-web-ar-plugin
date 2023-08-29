@@ -1,3 +1,4 @@
+import 'dart:js_interop';
 import 'dart:js_util';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'package:flutter_web_xr/test.dart';
@@ -55,7 +56,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
         .registerViewFactory(createdViewId, (int viewId) => canvas1);
   }
 
-  void initRenderer() {
+  void initRenderer() async {
     gl = canvas1.getContext('webgl', {'xrCompatible': true});
 
     final Object options = jsify({
@@ -68,6 +69,9 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     renderer = WebGLRenderer(options);
     renderer.autoClear = false;
     renderer.xr.enabled = true;
+
+    // final mediaStream =
+    //     await html.window.navigator.mediaDevices!.getUserMedia({'video': true});
 
     // Setzen Sie die Größe des Renderers auf die Größe des Canvas-Elements
     // renderer.setSize(
@@ -101,7 +105,6 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     // camera.position.x = 0;
     // camera.position.y = 2.5;
     // camera.position.z = 30;
-    // Position(0, 1.6, 3);
 
     // camera.position. set( 0, 1.6, 3 );
 
@@ -169,6 +172,8 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     FlutterWebXr().requestSession().then(allowInterop((session) async {
       setState(() => xrSession = session);
 
+      test1(session);
+
       final xrLayer = XRWebGLLayer(session, gl);
 
       // Create a XRRenderStateInit object with xrLayer as the baseLayer
@@ -198,10 +203,14 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
             final num glFramebuffer = getProperty(gl!, "FRAMEBUFFER");
             callMethod(gl!, 'bindFramebuffer', [glFramebuffer, framebuffer]);
 
+            test1(glFramebuffer);
+
             // Retrieve the pose of the device.
             // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
             final pose =
                 callMethod(xrFrame, 'getViewerPose', [xrReferenceSpace]);
+
+            test1(pose);
 
             if (pose != null) {
               // final xrTransform = pose.transform;
