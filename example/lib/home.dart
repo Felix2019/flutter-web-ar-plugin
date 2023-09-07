@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
+import 'package:flutter_web_xr/test.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:flutter_web_xr/widgets/cube_scene.dart';
 import 'package:flutter_web_xr/widgets/three_canvas.dart';
@@ -24,10 +25,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String _platformVersion = 'Unknown';
   final _flutterWebXrPlugin = FlutterWebXr();
 
-  bool isXrAvailable = false;
   bool startAR = false;
 
   bool startCamera = false;
@@ -40,15 +39,16 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    // initPlatformState();
+    initPlatformState();
     registerDiv();
   }
 
-  Future<String> getBatteryLevel() async {
+  Future<bool> isWebXrSupported() async {
     try {
-      final result = await _flutterWebXrPlugin.isWebXrAvailable();
+      final bool result = await _flutterWebXrPlugin.isWebXrAvailable();
+      return result;
     } catch (e) {
-      throw Exception('Failed to fetch battery level');
+      throw Exception('Failed to check web xr availability');
     }
   }
 
@@ -61,14 +61,15 @@ class _HomeState extends State<Home> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion = await _flutterWebXrPlugin.getPlatformVersion() ??
+      String userAgent = await _flutterWebXrPlugin.getPlatformVersion() ??
           'Unknown platform version';
+
+      // test1(isMobileDevice);
     } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      throw Exception('Failed to get platform version.');
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -76,9 +77,9 @@ class _HomeState extends State<Home> {
     // setState to update our non-existent appearance.
     if (!mounted) return;
 
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+    // setState(() {
+    //   _platformVersion = platformVersion;
+    // });
   }
 
   void openCamera() async {
@@ -119,64 +120,45 @@ class _HomeState extends State<Home> {
             IconButton.filledTonal(
                 onPressed: () {
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const CubeScene()),
-                  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CubeScene()));
                 },
                 icon: const Icon(Icons.video_collection)),
             const SizedBox(width: 20)
           ],
         ),
-        body: FutureBuilder<String>(
-          future: getBatteryLevel(),
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        body: FutureBuilder<bool>(
+          future: isWebXrSupported(),
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              final snackBar =
-                  SnackBar(content: Text(snapshot.error.toString()));
-
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              return const SizedBox();
+              return Center(child: Text(snapshot.error.toString()));
             } else {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Text('Running on: $_platformVersion\n'),
-                    ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          bool result =
-                              await _flutterWebXrPlugin.isWebXrAvailable();
-                          setState(() => isXrAvailable = result);
-                        },
-                        child: const Text("check web xr api")),
-                    Text(isXrAvailable.toString()),
-                    ElevatedButton(
-                        onPressed: () async {
-                          setState(() {
-                            startAR = true;
-                          });
-                        },
-                        child: const Text("start ar session")),
-                    startAR ? const MyCanvasTest() : const SizedBox(),
-                    const Spacer(),
-                    ElevatedButton(
-                        onPressed: () async {
-                          // test1("message");
-                          // _flutterWebXrPlugin.jsTest();
-                          createAlert("message");
-                        },
-                        child: const Text("js test")),
-                    ElevatedButton(
-                        onPressed: () => openCamera(),
-                        child: const Text("open camera")),
-                  ],
-                ),
-              );
+              print(snapshot.data);
+              if (snapshot.data == true) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () async {
+                            setState(() {
+                              startAR = true;
+                            });
+                          },
+                          child: const Text("start ar session")),
+                      startAR ? const MyCanvasTest() : const SizedBox(),
+                    ],
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text('WebXR not supported'),
+                );
+              }
             }
           },
         )
@@ -184,40 +166,7 @@ class _HomeState extends State<Home> {
         // startCamera
         //     ? const Column(
         //         children: [Expanded(child: HtmlElementView(viewType: 'video'))])
-        //     : Column(
-        //         children: [
-        //           Center(
-        //             child: Text('Running on: $_platformVersion\n'),
-        //           ),
-        //           ElevatedButton(
-        //               onPressed: () async {
-        //                 bool result =
-        //                     await _flutterWebXrPlugin.isWebXrAvailable();
-        //                 setState(() => isXrAvailable = result);
-        //               },
-        //               child: const Text("check web xr api")),
-        //           Text(isXrAvailable.toString()),
-        //           ElevatedButton(
-        //               onPressed: () async {
-        //                 setState(() {
-        //                   startAR = true;
-        //                 });
-        //               },
-        //               child: const Text("start ar session")),
-        //           startAR ? const MyCanvasTest() : const SizedBox(),
-        //           const Spacer(),
-        //           ElevatedButton(
-        //               onPressed: () async {
-        //                 // test1("message");
-        //                 // _flutterWebXrPlugin.jsTest();
-        //                 createAlert("message");
-        //               },
-        //               child: const Text("js test")),
-        //           ElevatedButton(
-        //               onPressed: () => openCamera(),
-        //               child: const Text("open camera")),
-        //         ],
-        //       ),
+
         );
   }
 }
