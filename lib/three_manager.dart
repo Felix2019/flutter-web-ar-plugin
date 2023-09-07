@@ -1,7 +1,6 @@
 @JS('THREE')
 library three;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:js/js.dart';
 import 'dart:html' as html;

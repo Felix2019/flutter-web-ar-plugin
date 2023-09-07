@@ -1,10 +1,7 @@
 import 'dart:html' as html;
-import 'dart:html';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gl/flutter_gl.dart';
-import 'package:three_dart/three3d/three.dart';
 import 'package:three_dart/three_dart.dart' as three;
 import 'dart:ui' as ui;
 
@@ -180,7 +177,7 @@ class _MyAppState extends State<WebglMaterialsBrowser> {
     if (verbose) print(" render: sourceTexture: $sourceTexture ");
   }
 
-  final html.CanvasElement canvas = CanvasElement()
+  final html.CanvasElement canvas = html.CanvasElement()
     ..style.backgroundColor = 'blue'
     ..style.width = '100%'
     ..style.height = '100%';
