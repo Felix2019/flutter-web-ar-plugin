@@ -6,7 +6,6 @@
 import 'dart:html' as html;
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
-import 'package:flutter_web_xr/test.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'dart:js_util';
 
@@ -66,6 +65,33 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     }
   }
 
+  @override
+  Future<Object> requestSession() async {
+    bool result =
+        await promiseToFuture(xrSystem!.isSessionSupported('immersive-ar'));
+
+    if (!result) {
+      throw Exception('WebXR not supported');
+    }
+
+    final sessionFuture =
+        await promiseToFuture(xrSystem!.requestSession("immersive-ar"));
+
+    return sessionFuture;
+  }
+
+  @override
+  void log(dynamic message) => log(message);
+
+  @override
+  void jsTest() async {
+    // var myObject1 = MyObject()
+    // myObject1.x = 10;
+    // myObject1.y = 20;
+
+    // print(stringify(myObject1));
+  }
+
   /// Retrieves the battery level of the device.
   ///
   /// This method makes use of the `getBattery` function (assumed to be defined elsewhere)
@@ -95,34 +121,5 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     } catch (e) {
       throw Exception('Failed to fetch battery level');
     }
-  }
-
-  @override
-  Future<Object> requestSession() async {
-    bool result =
-        await promiseToFuture(xrSystem!.isSessionSupported('immersive-ar'));
-
-    if (!result) {
-      throw Exception('WebXR not supported');
-    }
-
-    final sessionFuture =
-        await promiseToFuture(xrSystem!.requestSession("immersive-ar"));
-
-    return sessionFuture;
-  }
-
-  @override
-  void test(String message) async {
-    test1(message);
-  }
-
-  @override
-  void jsTest() async {
-    var myObject1 = MyObject();
-    myObject1.x = 10;
-    myObject1.y = 20;
-
-    print(stringify(myObject1));
   }
 }

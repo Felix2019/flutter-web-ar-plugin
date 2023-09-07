@@ -33,23 +33,3 @@ void main() {
   var a = jsObj.getSet;
   jsObj.method();
 }
-
-
-
-// @JS('navigator.getBattery')
-// external void hallo(void Function(BatteryManager) callback);
-
-// @JS()
-// @anonymous
-// class MyObject {
-//   external num get x;
-//   external set x(num value);
-
-//   external num get y;
-//   external set y(num value);
-// }
-
-// @JS()
-// external MyObject myObject();
-
-

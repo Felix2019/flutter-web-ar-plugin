@@ -1,8 +1,7 @@
 import 'dart:html';
 import 'dart:js_util';
 import 'package:flutter_gl/flutter_gl.dart';
-import 'package:flutter_web_xr/test.dart';
-import 'package:js/js.dart' as js;
+import 'package:flutter_web_xr/helper.dart';
 import 'package:three_dart/three_dart.dart' as three;
 
 import 'package:flutter/material.dart';
@@ -80,7 +79,7 @@ class _MyCanvasState extends State<MyCanvas> {
     gl = canvas.getContext('webgl', {'xrCompatible': true});
 
     print("register canvas");
-    test1("gl: $gl");
+    log("gl: $gl");
   }
 
   void startXRSession() {
@@ -161,7 +160,7 @@ class _MyCanvasState extends State<MyCanvas> {
   // fourth function to be called
   initRenderer() {
     print("init renderer");
-    test1(gl!);
+    log(gl!);
 
     // print("renderer ready");
 

@@ -1,6 +1,3 @@
-import 'package:flutter_web_xr/battery_manager.dart';
-import 'package:flutter_web_xr/web_xr_manager.dart';
-import 'package:flutter_web_xr/xr_session.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_web_xr_method_channel.dart';
@@ -42,11 +39,11 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("requestSession() has not been implemented.");
   }
 
-  void test(String message) {
-    throw UnimplementedError("Test function is not available");
+  void log(dynamic message) {
+    throw UnimplementedError("log() has not been implemented.");
   }
 
-  void jsTest() {
-    throw UnimplementedError("JS function is not available");
+  void test() {
+    throw UnimplementedError("test() has not been implemented.");
   }
 }

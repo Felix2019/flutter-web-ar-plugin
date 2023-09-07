@@ -1,7 +1,6 @@
-import 'dart:js_interop';
 import 'dart:js_util';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
-import 'package:flutter_web_xr/test.dart';
+import 'package:flutter_web_xr/helper.dart';
 import 'package:flutter_web_xr/three_manager.dart';
 import 'package:flutter/material.dart';
 import 'dart:html' as html;
@@ -172,7 +171,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     FlutterWebXr().requestSession().then(allowInterop((session) async {
       setState(() => xrSession = session);
 
-      test1(session);
+      log(session);
 
       final xrLayer = XRWebGLLayer(session, gl);
 
@@ -187,7 +186,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
       var xrReferenceSpace = await promiseToFuture(
           callMethod(session, 'requestReferenceSpace', [xrReferenceSpaceType]));
 
-      test1("requestReferenceSpace");
+      log("requestReferenceSpace");
 
       // register XR-Frame-Handler
       startFrameHandler() {
@@ -203,14 +202,14 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
             final num glFramebuffer = getProperty(gl!, "FRAMEBUFFER");
             callMethod(gl!, 'bindFramebuffer', [glFramebuffer, framebuffer]);
 
-            test1(glFramebuffer);
+            log(glFramebuffer);
 
             // Retrieve the pose of the device.
             // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
             final pose =
                 callMethod(xrFrame, 'getViewerPose', [xrReferenceSpace]);
 
-            test1(pose);
+            log(pose);
 
             if (pose != null) {
               // final xrTransform = pose.transform;
