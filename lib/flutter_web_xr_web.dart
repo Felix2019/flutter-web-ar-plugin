@@ -4,11 +4,11 @@
 // ignore: avoid_web_libraries_in_flutter
 
 import 'dart:html' as html;
+import 'dart:js_interop';
 
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:flutter_web_xr/test.dart';
-import 'dart:html' as html show window;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'dart:js_util';
 
@@ -22,12 +22,12 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     FlutterWebXrPlatform.instance = FlutterWebXrWeb();
   }
 
-  /// Returns a [String] containing the version of the platform.
-  // @override
-  // Future<String?> getPlatformVersion() async {
-  //   final version = html.window.navigator.userAgent;
-  //   return version;
-  // }
+  //Returns a [String] containing the version of the platform.
+  @override
+  Future<String?> getPlatformVersion() async {
+    final version = html.window.navigator.userAgent;
+    return version;
+  }
 
   @override
   Future<bool> isWebXrAvailable() async {
@@ -35,15 +35,19 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  Future<MyBatteryManager> getBatteryLevel() async {
-    // converts a javascript promise to a dart future
-    final Future<html.BatteryManager> batteryFuture =
-        promiseToFuture<html.BatteryManager>(getBattery());
+  Future<double> getBatteryLevel() async {
+    try {
+      // converts a javascript promise to a dart future
+      final Future<BatteryManager> batteryFuture =
+          promiseToFuture<BatteryManager>(getBattery());
 
-    final html.BatteryManager batteryManager = await batteryFuture;
+      final BatteryManager batteryManager = await batteryFuture;
 
-    return MyBatteryManager(getProperty(batteryManager, 'charging'),
-        getProperty(batteryManager, 'level'));
+      double level = getProperty(batteryManager, 'level');
+      return level;
+    } catch (e) {
+      throw Exception('Failed to fetch battery level');
+    }
   }
 
   @override

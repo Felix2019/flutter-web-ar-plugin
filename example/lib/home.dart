@@ -5,12 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
-import 'package:flutter_web_xr/test.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:flutter_web_xr/widgets/cube_scene.dart';
 import 'package:flutter_web_xr/widgets/three_canvas.dart';
+import 'package:flutter_web_xr_example/battery_page.dart';
 import 'package:flutter_web_xr_example/threeJs.dart';
 import 'package:flutter_web_xr/widgets/canvas.dart';
+import 'package:js/js.dart';
+
+@JS()
+external void createAlert(String message);
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -24,7 +28,6 @@ class _HomeState extends State<Home> {
   final _flutterWebXrPlugin = FlutterWebXr();
 
   bool isXrAvailable = false;
-  MyBatteryManager? battery;
   bool startAR = false;
 
   bool startCamera = false;
@@ -39,6 +42,14 @@ class _HomeState extends State<Home> {
     super.initState();
     // initPlatformState();
     registerDiv();
+  }
+
+  Future<String> getBatteryLevel() async {
+    try {
+      final result = await _flutterWebXrPlugin.isWebXrAvailable();
+    } catch (e) {
+      throw Exception('Failed to fetch battery level');
+    }
   }
 
   void registerDiv() {
@@ -92,81 +103,121 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Plugin example app'),
-        backgroundColor: Colors.black,
-        actions: [
-          // IconButton.filled(
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //             builder: (context) => const WebGlCamera(
-          //                   fileName: "sal",
-          //                 )),
-          //       );
-          //     },
-          //     icon: const Icon(Icons.abc)),
-          IconButton.outlined(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CubeScene()),
-                );
-              },
-              icon: const Icon(Icons.label_important))
-        ],
-      ),
-      body: startCamera
-          ? const Column(
-              children: [Expanded(child: HtmlElementView(viewType: 'video'))])
-          : Column(
-              children: [
-                Center(
-                  child: Text('Running on: $_platformVersion\n'),
-                ),
-                ElevatedButton(
-                    onPressed: () async {
-                      bool result =
-                          await _flutterWebXrPlugin.isWebXrAvailable();
-                      setState(() => isXrAvailable = result);
-                    },
-                    child: const Text("check web xr api")),
-                Text(isXrAvailable.toString()),
-                ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        MyBatteryManager result =
-                            await _flutterWebXrPlugin.getBatteryLevel();
+        appBar: AppBar(
+          title: const Text('Flutter Web AR Plugin'),
+          actions: [
+            IconButton.filledTonal(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BatteryPage(
+                              pluginInstance: _flutterWebXrPlugin)));
+                },
+                icon: const Icon(Icons.battery_charging_full)),
+            const SizedBox(width: 20),
+            IconButton.filledTonal(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CubeScene()),
+                  );
+                },
+                icon: const Icon(Icons.video_collection)),
+            const SizedBox(width: 20)
+          ],
+        ),
+        body: FutureBuilder<String>(
+          future: getBatteryLevel(),
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              final snackBar =
+                  SnackBar(content: Text(snapshot.error.toString()));
 
-                        setState(() => battery = result);
-                      } catch (e) {
-                        throw Exception(e);
-                      }
-                    },
-                    child: const Text("get battery level")),
-                Text(battery?.level.toString() ?? 'no battery'),
-                ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        startAR = true;
-                      });
-                    },
-                    child: const Text("start ar session")),
-                startAR ? const MyCanvasTest() : const SizedBox(),
-                const Spacer(),
-                ElevatedButton(
-                    onPressed: () async {
-                      test1("message");
-                      // _flutterWebXrPlugin.jsTest();
-                      await _flutterWebXrPlugin.getPlatformVersion();
-                    },
-                    child: const Text("js test")),
-                ElevatedButton(
-                    onPressed: () => openCamera(),
-                    child: const Text("open camera")),
-              ],
-            ),
-    );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              return const SizedBox();
+            } else {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Text('Running on: $_platformVersion\n'),
+                    ),
+                    ElevatedButton(
+                        onPressed: () async {
+                          bool result =
+                              await _flutterWebXrPlugin.isWebXrAvailable();
+                          setState(() => isXrAvailable = result);
+                        },
+                        child: const Text("check web xr api")),
+                    Text(isXrAvailable.toString()),
+                    ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            startAR = true;
+                          });
+                        },
+                        child: const Text("start ar session")),
+                    startAR ? const MyCanvasTest() : const SizedBox(),
+                    const Spacer(),
+                    ElevatedButton(
+                        onPressed: () async {
+                          // test1("message");
+                          // _flutterWebXrPlugin.jsTest();
+                          createAlert("message");
+                        },
+                        child: const Text("js test")),
+                    ElevatedButton(
+                        onPressed: () => openCamera(),
+                        child: const Text("open camera")),
+                  ],
+                ),
+              );
+            }
+          },
+        )
+
+        // startCamera
+        //     ? const Column(
+        //         children: [Expanded(child: HtmlElementView(viewType: 'video'))])
+        //     : Column(
+        //         children: [
+        //           Center(
+        //             child: Text('Running on: $_platformVersion\n'),
+        //           ),
+        //           ElevatedButton(
+        //               onPressed: () async {
+        //                 bool result =
+        //                     await _flutterWebXrPlugin.isWebXrAvailable();
+        //                 setState(() => isXrAvailable = result);
+        //               },
+        //               child: const Text("check web xr api")),
+        //           Text(isXrAvailable.toString()),
+        //           ElevatedButton(
+        //               onPressed: () async {
+        //                 setState(() {
+        //                   startAR = true;
+        //                 });
+        //               },
+        //               child: const Text("start ar session")),
+        //           startAR ? const MyCanvasTest() : const SizedBox(),
+        //           const Spacer(),
+        //           ElevatedButton(
+        //               onPressed: () async {
+        //                 // test1("message");
+        //                 // _flutterWebXrPlugin.jsTest();
+        //                 createAlert("message");
+        //               },
+        //               child: const Text("js test")),
+        //           ElevatedButton(
+        //               onPressed: () => openCamera(),
+        //               child: const Text("open camera")),
+        //         ],
+        //       ),
+        );
   }
 }

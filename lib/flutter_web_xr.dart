@@ -12,11 +12,11 @@ class FlutterWebXr {
     return FlutterWebXrPlatform.instance.getPlatformVersion();
   }
 
-  Future<MyBatteryManager> getBatteryLevel() {
+  Future<double> getBatteryLevel() {
     return FlutterWebXrPlatform.instance.getBatteryLevel();
   }
 
-  Future<dynamic> isWebXrAvailable() {
+  Future<bool> isWebXrAvailable() {
     return FlutterWebXrPlatform.instance.isWebXrAvailable();
   }
 
