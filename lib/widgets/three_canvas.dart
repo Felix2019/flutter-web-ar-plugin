@@ -76,8 +76,6 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     // renderer.setSize(
     //     window.innerWidth!.toDouble(), window.innerHeight!.toDouble());
 
-    var controller = renderer.xr.getController(0);
-
     // html.CanvasElement canvas = renderer.domElement;
     // gl = canvas.getContext('webgl', {'xrCompatible': true});
 
