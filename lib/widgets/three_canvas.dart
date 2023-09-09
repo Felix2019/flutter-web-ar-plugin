@@ -16,15 +16,10 @@ class MyCanvasTest extends StatefulWidget {
 }
 
 class _MyCanvasTestState extends State<MyCanvasTest> {
-  final html.CanvasElement canvas1 = html.CanvasElement()
+  final html.CanvasElement canvas = html.CanvasElement()
     ..style.width = '100%'
     ..style.height = '100%'
     ..style.backgroundColor = 'blue';
-
-  final html.DivElement container = html.DivElement()
-    ..style.width = '100%'
-    ..style.height = '100%'
-    ..style.backgroundColor = 'red';
 
   late WebGLRenderer renderer;
   late Scene scene;
@@ -38,7 +33,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
   @override
   void initState() {
     super.initState();
-    registerDiv();
+    registerCanvas();
 
     initRenderer();
     initScene();
@@ -48,19 +43,19 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     startXRSession();
   }
 
-  void registerDiv() {
+  void registerCanvas() {
     // Register div as a view and ensure the div is ready before we try to use it
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry
-        .registerViewFactory(createdViewId, (int viewId) => canvas1);
+        .registerViewFactory(createdViewId, (int viewId) => canvas);
   }
 
   void initRenderer() async {
-    gl = canvas1.getContext('webgl', {'xrCompatible': true});
+    gl = canvas.getContext('webgl', {'xrCompatible': true});
 
     final Object options = jsify({
       'context': gl,
-      'canvas': canvas1,
+      'canvas': canvas,
       'alpha': true,
       'preserveDrawingBuffer': true,
     });
@@ -68,19 +63,6 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     renderer = WebGLRenderer(options);
     renderer.autoClear = false;
     renderer.xr.enabled = true;
-
-    // final mediaStream =
-    //     await html.window.navigator.mediaDevices!.getUserMedia({'video': true});
-
-    // Setzen Sie die Größe des Renderers auf die Größe des Canvas-Elements
-    // renderer.setSize(
-    //     window.innerWidth!.toDouble(), window.innerHeight!.toDouble());
-
-    // html.CanvasElement canvas = renderer.domElement;
-    // gl = canvas.getContext('webgl', {'xrCompatible': true});
-
-    // add the created canvas to the html document body
-    // container.append(canvas);
   }
 
   void initScene() {
@@ -109,6 +91,8 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
     // camera.matrixAutoUpdate = false;
   }
 
+  List<Mesh> cubes = [];
+
   void addElement() {
     final materials = [
       MeshBasicMaterial(jsify({'color': 0xff0000})),
@@ -118,9 +102,6 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
       MeshBasicMaterial(jsify({'color': 0x00ffff})),
       MeshBasicMaterial(jsify({'color': 0xffff00}))
     ];
-
-    final geometry = BoxGeometry(1, 1, 1);
-    cube = Mesh(geometry, materials);
 
     const rowCount = 4;
     const spread = 1;
@@ -137,30 +118,33 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
           box.position.y = j - half;
           box.position.z = k - half;
 
+          box.rotation.x += 7;
+          box.rotation.y += 7;
+
           // const box = new THREE.Mesh(new THREE.BoxBufferGeometry(0.2, 0.2, 0.2), materials);
           // box.position.set(i - half, j - HALF, k - HALF);
           // box.position.multiplyScalar(spread);
           scene.add(box);
+          cubes.add(box);
         }
       }
     }
 
-    // cube.position.x = 10;
-    // cube.position.y = 30;
-    // cube.position.z = 50;
-
-    cube.rotation.x += 7;
-    cube.rotation.y += 7;
-    scene.add(cube);
+    // cube.rotation.x += 7;
+    // cube.rotation.y += 7;
+    // scene.add(cube);
   }
 
-  void animate() {
-    cube.rotation.x += 0.07;
-    cube.rotation.y += 0.07;
+  void animate(Mesh cube) {
+    cube.rotation.x += 0.03;
+    cube.rotation.y += 0.03;
   }
 
   void render() {
-    // animate();
+    for (var i = 0; i < cubes.length; i++) {
+      final cube = cubes[i];
+      animate(cube);
+    }
     renderer.render(scene, camera);
   }
 
@@ -221,8 +205,7 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
               // In mobile AR, we only have one view.
               final views = getProperty(pose, 'views');
 
-              final Viewport viewport =
-                  callMethod(baseLayer, 'getViewport', [views[0]]);
+              final viewport = callMethod(baseLayer, 'getViewport', [views[0]]);
 
               final viewportWidth = getProperty(viewport, 'width');
               final viewportHeight = getProperty(viewport, 'height');
@@ -256,9 +239,9 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
 
   @override
   Widget build(BuildContext context) {
-    // return const SizedBox();
-    return Expanded(
-      child: HtmlElementView(viewType: createdViewId),
-    );
+    return const SizedBox();
+    // return Expanded(
+    //   child: HtmlElementView(viewType: createdViewId),
+    // );
   }
 }

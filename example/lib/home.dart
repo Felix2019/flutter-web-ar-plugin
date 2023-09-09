@@ -3,6 +3,7 @@ import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'package:flutter_web_xr/widgets/cube_scene.dart';
 import 'package:flutter_web_xr/widgets/three_canvas.dart';
 import 'package:flutter_web_xr_example/battery_page.dart';
+import 'package:flutter_web_xr_example/threeJs.dart';
 import 'package:js/js.dart';
 
 @JS()
@@ -35,6 +36,15 @@ class _HomeState extends State<Home> {
         appBar: AppBar(
           title: const Text('Flutter Web AR Plugin'),
           actions: [
+            IconButton.filledTonal(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              WebglMaterialsBrowser(fileName: "")));
+                },
+                icon: const Icon(Icons.battery_charging_full)),
             IconButton.filledTonal(
                 onPressed: () {
                   Navigator.push(

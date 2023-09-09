@@ -18,6 +18,11 @@ class _CubeSceneState extends State<CubeScene> {
     ..style.height = '100%'
     ..style.backgroundColor = 'blue';
 
+  // final html.DivElement container = html.DivElement()
+  //   ..style.width = '100%'
+  //   ..style.height = '100%'
+  //   ..style.backgroundColor = 'red';
+
   late WebGLRenderer renderer;
   late Scene scene;
   late PerspectiveCamera camera;
@@ -63,6 +68,7 @@ class _CubeSceneState extends State<CubeScene> {
 
     // html.CanvasElement canvas = renderer.domElement;
     // gl = canvas.getContext('webgl', {'xrCompatible': true});
+
     // add the created canvas to the html document body
     // container.append(canvas);
   }

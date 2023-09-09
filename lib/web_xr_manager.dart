@@ -6,13 +6,13 @@ import 'package:js/js.dart';
 @JS('navigator.xr')
 external XRSystem? get xrSystem;
 
+bool isWebXrSupported() => xrSystem != null;
+
 @JS("XRSystem")
 class XRSystem {
   external XRSession requestSession(String mode);
   external bool isSessionSupported(String mode);
 }
-
-bool isWebXrSupported() => xrSystem != null;
 
 @JS('navigator.xr.requestSession')
 external dynamic startSession(String sessionType);

@@ -92,7 +92,7 @@ class _MyAppState extends State<WebglMaterialsBrowser> {
     Map<String, dynamic> options = {
       "width": width,
       "height": height,
-      "gl": three3dRender.gl,
+      "gl": three3dRender.openGL,
       "antialias": true,
       "canvas": three3dRender.element
     };
@@ -103,7 +103,6 @@ class _MyAppState extends State<WebglMaterialsBrowser> {
   }
 
   initPage() async {
-    // camera = three.PerspectiveCamera(45, width / height, 1, 2000);
     camera = three.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.z = 250;
     scene = three.Scene();
