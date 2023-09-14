@@ -1,3 +1,6 @@
+@JS()
+library battery_manager;
+
 import 'package:js/js.dart';
 
 @JS('BatteryManager')
@@ -14,22 +17,22 @@ extension on BatteryManager {
 external BatteryManager getBattery();
 
 @JS()
-@staticInterop
-class StaticInterop {
-  external factory StaticInterop();
+// @staticInterop
+class Test {
+  external factory Test(String name);
 }
 
-extension on StaticInterop {
-  external int field;
-  external int get getSet;
-  external set getSet1(int val);
-  external int method();
-}
+// extension on StaticInterop {
+//   external int field;
+//   external int get getSet;
+//   external set getSet1(int val);
+//   external int method();
+// }
 
-void main() {
-  var jsObj = StaticInterop();
-  jsObj.field = 1;
-  jsObj.getSet1 = 2;
-  var a = jsObj.getSet;
-  jsObj.method();
-}
+// void main() {
+//   var jsObj = StaticInterop("test");
+//   jsObj.field = 1;
+//   jsObj.getSet1 = 2;
+//   var a = jsObj.getSet;
+//   jsObj.method();
+// }

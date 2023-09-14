@@ -37,10 +37,17 @@ Map<String, dynamic> objectToMap(jsObject) {
 external dynamic jsOpenTabFunction(String url);
 
 @JS('console.log')
-external void log(dynamic message);
+external void domLog(dynamic message);
 
 @JS('JSON.stringify')
 external String stringify(Object? obj);
+
+@JS('WebGL2RenderingContext')
+@staticInterop
+class WebGL2RenderingContext {}
+
+
+
 
 // @JS()
 // @anonymous

@@ -17,8 +17,8 @@ class FlutterWebXr {
     return FlutterWebXrPlatform.instance.requestSession();
   }
 
-  void log(String message) {
-    return FlutterWebXrPlatform.instance.log(message);
+  void jsPrint(String message) {
+    return FlutterWebXrPlatform.instance.jsPrint(message);
   }
 
   void test() {

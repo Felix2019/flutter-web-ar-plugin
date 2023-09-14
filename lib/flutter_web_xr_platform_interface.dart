@@ -39,7 +39,7 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("requestSession() has not been implemented.");
   }
 
-  void log(dynamic message) {
+  void jsPrint(dynamic message) {
     throw UnimplementedError("log() has not been implemented.");
   }
 

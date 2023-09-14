@@ -42,7 +42,7 @@ class _HomeState extends State<Home> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              WebglMaterialsBrowser(fileName: "")));
+                              const WebglMaterialsBrowser(fileName: "")));
                 },
                 icon: const Icon(Icons.battery_charging_full)),
             IconButton.filledTonal(
@@ -55,15 +55,21 @@ class _HomeState extends State<Home> {
                 },
                 icon: const Icon(Icons.battery_charging_full)),
             const SizedBox(width: 20),
+            // IconButton.filledTonal(
+            //     onPressed: () {
+            //       Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (context) => const CubeScene()));
+            //     },
+            //     icon: const Icon(Icons.video_collection)),
+            const SizedBox(width: 20),
+            const SizedBox(width: 20),
             IconButton.filledTonal(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CubeScene()));
+                  _flutterWebXrPlugin.test();
                 },
                 icon: const Icon(Icons.video_collection)),
-            const SizedBox(width: 20)
           ],
         ),
         body: FutureBuilder<bool>(

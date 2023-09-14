@@ -4,7 +4,11 @@
 // ignore: avoid_web_libraries_in_flutter
 
 import 'dart:html' as html;
+import 'dart:js_interop';
 import 'package:flutter_web_xr/battery_manager.dart';
+import 'package:flutter_web_xr/src/webxr/interop/core.dart';
+import 'package:flutter_web_xr/utils.dart';
+import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
 import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'dart:js_util';
@@ -81,10 +85,18 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  void log(dynamic message) => log(message);
+  void jsPrint(dynamic message) => domLog(message);
 
   @override
-  void jsTest() async {
+  void test() {
+    jsPrint("test function");
+    var pos = Position(2, 2, 2);
+
+    // log(pos.x);
+
+    // jsObj.getSet1 = 2;
+    // var a = jsObj.getSet;
+    // jsObj.method();
     // var myObject1 = MyObject()
     // myObject1.x = 10;
     // myObject1.y = 20;
