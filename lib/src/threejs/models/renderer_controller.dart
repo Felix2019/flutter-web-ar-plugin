@@ -53,7 +53,7 @@ class RendererController implements RendererOperations {
 
       renderer = WebGLRenderer(options);
       renderer.autoClear = false;
-      // renderer.xr.enabled = true;
+      renderer.xr.enabled = true;
     } catch (e) {
       throw Exception('Failed to initialize renderer: $e');
     }

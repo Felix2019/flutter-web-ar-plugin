@@ -1,6 +1,8 @@
 import 'dart:html';
 import 'dart:js_util';
 import 'package:flutter_gl/flutter_gl.dart';
+import 'package:flutter_web_xr/src/webxr/interop/xr_render_state.dart';
+import 'package:flutter_web_xr/src/webxr/interop/xr_web_gl_layer.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:three_dart/three_dart.dart' as three;
 
@@ -8,8 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'dart:html' as html;
 import 'dart:ui' as ui;
-
-import '../web_xr_manager.dart';
 
 class MyCanvas extends StatefulWidget {
   const MyCanvas({super.key});

@@ -4,12 +4,11 @@
 // ignore: avoid_web_libraries_in_flutter
 
 import 'dart:html' as html;
-import 'dart:js_interop';
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/src/webxr/interop/core.dart';
+import 'package:flutter_web_xr/src/webxr/interop/xr_session.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
-import 'package:flutter_web_xr/web_xr_manager.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'dart:js_util';
 
@@ -70,7 +69,8 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  Future<Object> requestSession() async {
+  Future<XRSession> requestSession() async {
+    // call xr controller
     bool result =
         await promiseToFuture(xrSystem!.isSessionSupported('immersive-ar'));
 
@@ -81,7 +81,13 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     final sessionFuture =
         await promiseToFuture(xrSystem!.requestSession("immersive-ar"));
 
+    domLog(sessionFuture);
+
     return sessionFuture;
+  }
+
+  Future initSession() async {
+    // call from web xr manager
   }
 
   @override

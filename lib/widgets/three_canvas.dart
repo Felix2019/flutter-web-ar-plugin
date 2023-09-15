@@ -4,11 +4,12 @@ import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/mesh_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
+import 'package:flutter_web_xr/src/webxr/interop/xr_render_state.dart';
+import 'package:flutter_web_xr/src/webxr/interop/xr_session.dart';
+import 'package:flutter_web_xr/src/webxr/interop/xr_web_gl_layer.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter_web_xr/web_xr_manager.dart';
 
 class MyCanvasTest extends StatefulWidget {
   const MyCanvasTest({super.key});
@@ -90,89 +91,94 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
   }
 
   void startXRSession() {
-    // var sessionInit = XRSessionInit(immersiveAr: true); as option parameter in requestSession
-    FlutterWebXr().requestSession().then(allowInterop((session) async {
-      setState(() => xrSession = session);
+    var sessionInit = XRSessionInit(immersiveAr: true);
 
-      gl = rendererController.glObject;
+    domLog(sessionInit);
 
-      final xrLayer = XRWebGLLayer(session, gl);
+    // void startXRSession() {
+    //   // var sessionInit = XRSessionInit(immersiveAr: true); as option parameter in requestSession
+    //   FlutterWebXr().requestSession().then(allowInterop((session) async {
+    //     setState(() => xrSession = session);
 
-      // Create a XRRenderStateInit object with xrLayer as the baseLayer
-      final renderStateInit = XRRenderStateInit(baseLayer: xrLayer);
+    //     gl = rendererController.glObject;
 
-      // Pass the XRRenderStateInit object to updateRenderState
-      callMethod(session, 'updateRenderState', [renderStateInit]);
+    //     final xrLayer = XRWebGLLayer(session, gl);
 
-      // request the reference space
-      const xrReferenceSpaceType = 'local';
-      var xrReferenceSpace = await promiseToFuture(
-          callMethod(session, 'requestReferenceSpace', [xrReferenceSpaceType]));
+    //     // Create a XRRenderStateInit object with xrLayer as the baseLayer
+    //     final renderStateInit = XRRenderStateInit(baseLayer: xrLayer);
 
-      // register XR-Frame-Handler
-      startFrameHandler() {
-        callMethod(session, 'requestAnimationFrame', [
-          allowInterop((time, xrFrame) {
-            startFrameHandler();
+    //     // Pass the XRRenderStateInit object to updateRenderState
+    //     callMethod(session, 'updateRenderState', [renderStateInit]);
 
-            // Bind the graphics framebuffer to the baseLayer's framebuffer.
-            final renderState = getProperty(session, 'renderState');
-            final baseLayer = getProperty(renderState, 'baseLayer');
-            final framebuffer = getProperty(baseLayer, 'framebuffer');
+    //     // request the reference space
+    //     const xrReferenceSpaceType = 'local';
+    //     var xrReferenceSpace = await promiseToFuture(
+    //         callMethod(session, 'requestReferenceSpace', [xrReferenceSpaceType]));
 
-            final num glFramebuffer = getProperty(gl!, "FRAMEBUFFER");
-            callMethod(gl!, 'bindFramebuffer', [glFramebuffer, framebuffer]);
+    //     // register XR-Frame-Handler
+    //     startFrameHandler() {
+    //       callMethod(session, 'requestAnimationFrame', [
+    //         allowInterop((time, xrFrame) {
+    //           startFrameHandler();
 
-            // Retrieve the pose of the device.
-            // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
-            final pose =
-                callMethod(xrFrame, 'getViewerPose', [xrReferenceSpace]);
+    //           // Bind the graphics framebuffer to the baseLayer's framebuffer.
+    //           final renderState = getProperty(session, 'renderState');
+    //           final baseLayer = getProperty(renderState, 'baseLayer');
+    //           final framebuffer = getProperty(baseLayer, 'framebuffer');
 
-            domLog(pose);
+    //           final num glFramebuffer = getProperty(gl!, "FRAMEBUFFER");
+    //           callMethod(gl!, 'bindFramebuffer', [glFramebuffer, framebuffer]);
 
-            if (pose != null) {
-              // final xrTransform = pose.transform;
-              // final xrPosition = xrTransform.position;
-              // final xrOrientation = xrTransform.orientation;
+    //           // Retrieve the pose of the device.
+    //           // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
+    //           final pose =
+    //               callMethod(xrFrame, 'getViewerPose', [xrReferenceSpace]);
 
-              // camera.position.x = xrPosition.x;
-              // camera.position.y = xrPosition.y;
-              // camera.position.z = xrPosition.z;
+    //           domLog(pose);
 
-              // In mobile AR, we only have one view.
-              final views = getProperty(pose, 'views');
+    //           if (pose != null) {
+    //             // final xrTransform = pose.transform;
+    //             // final xrPosition = xrTransform.position;
+    //             // final xrOrientation = xrTransform.orientation;
 
-              final viewport = callMethod(baseLayer, 'getViewport', [views[0]]);
+    //             // camera.position.x = xrPosition.x;
+    //             // camera.position.y = xrPosition.y;
+    //             // camera.position.z = xrPosition.z;
 
-              final viewportWidth = getProperty(viewport, 'width');
-              final viewportHeight = getProperty(viewport, 'height');
-              rendererController.setSize(viewportWidth, viewportHeight);
+    //             // In mobile AR, we only have one view.
+    //             final views = getProperty(pose, 'views');
 
-              // Aktualisiere die Position der Kamera basierend auf xrPosition
-              // camera.position.setFromMatrixPosition(xrPosition);
+    //             final viewport = callMethod(baseLayer, 'getViewport', [views[0]]);
 
-              // camera.updateProjectionMatrix();
+    //             final viewportWidth = getProperty(viewport, 'width');
+    //             final viewportHeight = getProperty(viewport, 'height');
+    //             rendererController.setSize(viewportWidth, viewportHeight);
 
-              final transformProperty = getProperty(views[0], 'transform');
-              final matrix = getProperty(transformProperty, 'matrix');
+    //             // Aktualisiere die Position der Kamera basierend auf xrPosition
+    //             // camera.position.setFromMatrixPosition(xrPosition);
 
-              // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-              final camera = cameraController.cameraInstance;
-              callMethod(camera.matrix, 'fromArray', [matrix]);
+    //             // camera.updateProjectionMatrix();
 
-              callMethod(camera.projectionMatrix, 'fromArray',
-                  [views[0].projectionMatrix]);
+    //             final transformProperty = getProperty(views[0], 'transform');
+    //             final matrix = getProperty(transformProperty, 'matrix');
 
-              camera.updateMatrixWorld(true);
+    //             // Use the view's transform matrix and projection matrix to configure the THREE.camera.
+    //             final camera = cameraController.cameraInstance;
+    //             callMethod(camera.matrix, 'fromArray', [matrix]);
 
-              render();
-            }
-          })
-        ]);
-      }
+    //             callMethod(camera.projectionMatrix, 'fromArray',
+    //                 [views[0].projectionMatrix]);
 
-      startFrameHandler();
-    }));
+    //             camera.updateMatrixWorld(true);
+
+    //             render();
+    //           }
+    //         })
+    //       ]);
+    //     }
+
+    //     startFrameHandler();
+    //   }));
   }
 
   @override
