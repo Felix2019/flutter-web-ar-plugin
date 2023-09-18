@@ -90,11 +90,10 @@ class _MyCanvasTestState extends State<MyCanvasTest> {
         sceneController.scene, cameraController.cameraInstance);
   }
 
-  void startXRSession() {
-    var sessionInit = XRSessionInit(immersiveAr: true);
+  void startXRSession() async {
+    var plugin = FlutterWebXr();
 
-    domLog(sessionInit);
-
+    await plugin.requestSession();
     // void startXRSession() {
     //   // var sessionInit = XRSessionInit(immersiveAr: true); as option parameter in requestSession
     //   FlutterWebXr().requestSession().then(allowInterop((session) async {

@@ -9,8 +9,8 @@ class XRRenderState {
   external void end();
 
   // this.xrSession.renderState.baseLayer.framebuffer
-  // external XRWebGLLayer get baseLayer;
-  external get renderState;
+  external XRWebGLLayer get baseLayer;
+  // external get renderState;
 }
 
 @JS()

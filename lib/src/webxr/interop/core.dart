@@ -15,6 +15,9 @@ class XRSystem {
 @JS('navigator.xr.requestSession')
 external dynamic startSession(String sessionType);
 
+@JS('XRReferenceSpace')
+class XRReferenceSpace {}
+
 // not used currently
 @JS()
 class XR {

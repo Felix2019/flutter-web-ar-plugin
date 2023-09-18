@@ -7,6 +7,7 @@ import 'dart:html' as html;
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/src/webxr/interop/core.dart';
 import 'package:flutter_web_xr/src/webxr/interop/xr_session.dart';
+import 'package:flutter_web_xr/src/webxr/models/xr_controller.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -17,6 +18,8 @@ import 'flutter_web_xr_platform_interface.dart';
 /// A web implementation of the FlutterWebXrPlatform of the FlutterWebXr plugin.
 class FlutterWebXrWeb extends FlutterWebXrPlatform {
   FlutterWebXrWeb();
+
+  final XRController xrController = XRController();
 
   static void registerWith(Registrar registrar) {
     FlutterWebXrPlatform.instance = FlutterWebXrWeb();
@@ -69,21 +72,27 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  Future<XRSession> requestSession() async {
-    // call xr controller
-    bool result =
-        await promiseToFuture(xrSystem!.isSessionSupported('immersive-ar'));
+  Future<dynamic> requestSession() async {
+    try {
+      await xrController.requestSession();
+      xrController.startFrameHandler();
 
-    if (!result) {
-      throw Exception('WebXR not supported');
+      // add xr controller start session operation
+    } catch (e) {
+      throw Exception('operation failed');
     }
 
-    final sessionFuture =
-        await promiseToFuture(xrSystem!.requestSession("immersive-ar"));
+    // bool result =
+    //     await promiseToFuture(xrSystem!.isSessionSupported('immersive-ar'));
 
-    domLog(sessionFuture);
+    // if (!result) {
+    //   throw Exception('WebXR not supported');
+    // }
 
-    return sessionFuture;
+    // final sessionFuture =
+    //     await promiseToFuture(xrSystem!.requestSession("immersive-ar"));
+
+    // domLog(sessionFuture);
   }
 
   Future initSession() async {
