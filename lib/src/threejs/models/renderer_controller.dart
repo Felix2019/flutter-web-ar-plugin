@@ -5,7 +5,9 @@ import 'package:flutter_web_xr/src/threejs/interop/base.dart';
 import 'dart:html' as html;
 import 'dart:ui' as ui;
 
-import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
+import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
+import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
+import 'package:flutter_web_xr/utils.dart';
 
 class RendererController implements RendererOperations {
   late WebGLRenderer renderer;
@@ -19,8 +21,16 @@ class RendererController implements RendererOperations {
     ..style.height = '100%'
     ..style.backgroundColor = 'blue';
 
+  late SceneController sceneController;
+  late CameraController cameraController;
+
   RendererController._() {
+    domLog("create renderer controller");
+
     _registerCanvas();
+
+    sceneController = SceneController();
+    cameraController = CameraController();
   }
 
   factory RendererController.create() {
@@ -60,8 +70,8 @@ class RendererController implements RendererOperations {
   }
 
   @override
-  void render(Scene scene, PerspectiveCamera camera) =>
-      renderer.render(scene, camera);
+  void render() => renderer.render(
+      sceneController.scene, cameraController.perspectiveCamera);
 
   @override
   void setSize(num width, num height) => renderer.setSize(width, height);

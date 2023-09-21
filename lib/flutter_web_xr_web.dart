@@ -5,8 +5,9 @@
 
 import 'dart:html' as html;
 import 'package:flutter_web_xr/battery_manager.dart';
+import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
+import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
 import 'package:flutter_web_xr/src/webxr/interop/core.dart';
-import 'package:flutter_web_xr/src/webxr/interop/xr_session.dart';
 import 'package:flutter_web_xr/src/webxr/models/xr_controller.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
@@ -20,6 +21,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   FlutterWebXrWeb();
 
   final XRController xrController = XRController();
+  // final SceneController sceneController = SceneController();
 
   static void registerWith(Registrar registrar) {
     FlutterWebXrPlatform.instance = FlutterWebXrWeb();
@@ -72,27 +74,113 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  Future<dynamic> requestSession() async {
+  Future<void> endSession() async {
     try {
+      await xrController.endSession();
+    } catch (e) {
+      throw Exception('Failed to end session');
+    }
+  }
+
+  @override
+  void createCube() {
+    xrController.addElement();
+    // final BoxGeometry geometry = BoxGeometry(1, 1, 1);
+    // final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
+
+    // final materials = [
+    //   MeshBasicMaterial(jsify({'color': 0xff0000})),
+    //   MeshBasicMaterial(jsify({'color': 0x0000ff})),
+    //   MeshBasicMaterial(jsify({'color': 0x00ff00})),
+    //   MeshBasicMaterial(jsify({'color': 0xff00ff})),
+    //   MeshBasicMaterial(jsify({'color': 0x00ffff})),
+    //   MeshBasicMaterial(jsify({'color': 0xffff00}))
+    // ];
+
+    // final Mesh object = Mesh(geometry, materials);
+    // // object.position.x = 0;
+    // // object.position.y = 0;
+    // object.position.z = -1;
+
+    // object.rotation.x += 7;
+    // object.rotation.y += 7;
+
+    // xrController.sceneController.addElement(object);
+  }
+
+  void multiplyObject() {
+    const rowCount = 4;
+    const half = rowCount / 2;
+
+    final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
+    // final BoxGeometry geometry = BoxGeometry(2, 2, 2);
+
+    final materials = [
+      MeshBasicMaterial(jsify({'color': 0xff0000})),
+      MeshBasicMaterial(jsify({'color': 0x0000ff})),
+      MeshBasicMaterial(jsify({'color': 0x00ff00})),
+      MeshBasicMaterial(jsify({'color': 0xff00ff})),
+      MeshBasicMaterial(jsify({'color': 0x00ffff})),
+      MeshBasicMaterial(jsify({'color': 0xffff00}))
+    ];
+
+    for (var i = 0; i < rowCount; i++) {
+      for (var j = 0; j < rowCount; j++) {
+        for (var k = 0; k < rowCount; k++) {
+          final Mesh object = Mesh(geometry, materials);
+
+          object.position.x = i - half;
+          object.position.y = j - half;
+          object.position.z = k - half;
+
+          domLog(object.position);
+
+          object.rotation.x += 7;
+          object.rotation.y += 7;
+
+          xrController.sceneController.addElement(object);
+          // sceneController.addElement(object);
+        }
+      }
+    }
+  }
+
+  html.DivElement overlay = html.DivElement()
+    ..id = 'ar-overlay'
+    ..style.position = 'absolute'
+    ..style.top = '0'
+    ..style.left = '0'
+    ..style.width = '100%'
+    ..style.height = '100%'
+    ..style.zIndex = '100000'
+    ..style.backgroundColor = "red"
+    ..innerText = 'Hier ist das AR DOM Overlay!';
+
+  @override
+  Future<void> startSession() async {
+    try {
+      // multiplyObject();
+
+      // createCube();
+
       await xrController.requestSession();
       xrController.startFrameHandler();
 
-      // add xr controller start session operation
+      // html.document.body!.children.add(overlay);
+
+      // overlay.onClick.listen((event) {
+      //   print('Overlay angeklickt!');
+      // });
+
+      // createCube();
+      // xrController.rendererController.render();
+
+      // Future.delayed(Duration(seconds: 2), () async {
+      //   createCube();
+      // });
     } catch (e) {
       throw Exception('operation failed');
     }
-
-    // bool result =
-    //     await promiseToFuture(xrSystem!.isSessionSupported('immersive-ar'));
-
-    // if (!result) {
-    //   throw Exception('WebXR not supported');
-    // }
-
-    // final sessionFuture =
-    //     await promiseToFuture(xrSystem!.requestSession("immersive-ar"));
-
-    // domLog(sessionFuture);
   }
 
   Future initSession() async {

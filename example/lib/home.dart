@@ -1,25 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
-import 'package:flutter_web_xr/widgets/cube_scene.dart';
-import 'package:flutter_web_xr/widgets/three_canvas.dart';
 import 'package:flutter_web_xr_example/battery_page.dart';
 import 'package:flutter_web_xr_example/threeJs.dart';
-import 'package:js/js.dart';
 
-@JS()
-external void createAlert(String message);
-
-class Home extends StatefulWidget {
-  const Home({super.key});
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
+class Home extends StatelessWidget {
   final _flutterWebXrPlugin = FlutterWebXr();
 
-  bool startAR = false;
+  Home({super.key});
 
   Future<bool> isWebXrSupported() async {
     try {
@@ -27,6 +14,14 @@ class _HomeState extends State<Home> {
       return result;
     } catch (e) {
       throw Exception('Failed to check web xr availability');
+    }
+  }
+
+  Future<void> startXRSession() async {
+    try {
+      await _flutterWebXrPlugin.startSession();
+    } catch (e) {
+      throw Exception('Failed to start web xr session');
     }
   }
 
@@ -87,20 +82,13 @@ class _HomeState extends State<Home> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                          onPressed: () async {
-                            setState(() {
-                              startAR = true;
-                            });
-                          },
+                          onPressed: () async => await startXRSession(),
                           child: const Text("start ar session")),
-                      startAR ? const MyCanvasTest() : const SizedBox(),
                     ],
                   ),
                 );
               } else {
-                return const Center(
-                  child: Text('WebXR not supported'),
-                );
+                return const Center(child: Text('WebXR not supported'));
               }
             }
           },

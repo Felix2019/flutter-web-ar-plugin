@@ -35,8 +35,16 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("isWebXrAvailable() has not been implemented.");
   }
 
-  Future<dynamic> requestSession() {
-    throw UnimplementedError("requestSession() has not been implemented.");
+  Future<void> startSession() {
+    throw UnimplementedError("startSession() has not been implemented.");
+  }
+
+  Future<void> endSession() {
+    throw UnimplementedError("endSession() has not been implemented.");
+  }
+
+  void createCube() {
+    throw UnimplementedError("createCube() has not been implemented.");
   }
 
   void jsPrint(dynamic message) {

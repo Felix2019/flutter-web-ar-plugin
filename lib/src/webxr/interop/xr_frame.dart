@@ -4,8 +4,10 @@ import 'package:js/js.dart';
 
 @JS('XRFrame')
 class XRFrame {
-  external XRViewerPose getViewerPose(XRReferenceSpace referenceSpace);
+  external XRViewerPose? getViewerPose(XRReferenceSpace referenceSpace);
   external XRSession get xrSession;
+  external XRRigidTransform get transform;
+  external List<double> get projectionMatrix;
 }
 
 @JS('XRViewerPose')

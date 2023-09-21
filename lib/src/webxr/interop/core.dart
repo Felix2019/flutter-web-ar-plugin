@@ -1,3 +1,4 @@
+import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
 import 'package:flutter_web_xr/src/webxr/interop/xr_session.dart';
 import 'package:js/js.dart';
 
@@ -8,7 +9,7 @@ bool isWebXrSupported() => xrSystem != null;
 
 @JS("XRSystem")
 class XRSystem {
-  external XRSession requestSession(String mode);
+  external XRSession requestSession(String mode, dynamic options);
   external bool isSessionSupported(String mode);
 }
 
@@ -17,6 +18,19 @@ external dynamic startSession(String sessionType);
 
 @JS('XRReferenceSpace')
 class XRReferenceSpace {}
+
+@JS('XRViewport')
+class XRViewport {
+  external int get height;
+  external int get width;
+}
+
+@JS('XRRigidTransform')
+class XRRigidTransform {
+  external get position;
+  external get orientation;
+  external List<double> matrix;
+}
 
 // not used currently
 @JS()

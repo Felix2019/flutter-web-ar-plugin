@@ -24,6 +24,7 @@ class PerspectiveCamera {
 @JS('Scene')
 class Scene {
   external factory Scene();
-  external add(dynamic object);
+  external void add(dynamic object);
+  external void clear();
   external set background(Color? color);
 }

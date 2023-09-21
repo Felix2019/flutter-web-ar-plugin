@@ -13,8 +13,16 @@ class FlutterWebXr {
     return FlutterWebXrPlatform.instance.isWebXrAvailable();
   }
 
-  Future<dynamic> requestSession() {
-    return FlutterWebXrPlatform.instance.requestSession();
+  Future<void> startSession() {
+    return FlutterWebXrPlatform.instance.startSession();
+  }
+
+  Future<void> endSession() {
+    return FlutterWebXrPlatform.instance.endSession();
+  }
+
+  void createCube() {
+    return FlutterWebXrPlatform.instance.createCube();
   }
 
   void jsPrint(String message) {

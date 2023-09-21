@@ -7,10 +7,7 @@ class XRRenderState {
   external void updateRenderState(dynamic state);
   external void requestAnimationFrame(Function callback);
   external void end();
-
-  // this.xrSession.renderState.baseLayer.framebuffer
   external XRWebGLLayer get baseLayer;
-  // external get renderState;
 }
 
 @JS()

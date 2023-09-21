@@ -3,6 +3,7 @@ library base;
 
 import 'dart:html' as html;
 
+import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
 import 'package:flutter_web_xr/src/webxr/interop/core.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:js/js.dart';
@@ -16,7 +17,7 @@ class Object3D {
 class WebGLRenderer {
   external factory WebGLRenderer([Object options]);
   external html.CanvasElement get domElement;
-  external void render(dynamic scene, dynamic camera);
+  external void render(Scene scene, dynamic camera);
   external XR get xr;
   external void setSize(num width, num height);
   external set autoClear(bool value);

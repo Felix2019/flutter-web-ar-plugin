@@ -82,41 +82,41 @@ class _MyCanvasState extends State<MyCanvas> {
     domLog("gl: $gl");
   }
 
-  void startXRSession() {
-    // var sessionInit = XRSessionInit(immersiveAr: true); as option parameter in requestSession
-    FlutterWebXr().requestSession().then(allowInterop((session) async {
-      setState(() => xrSession = session);
+  // void startXRSession() {
+  //   // var sessionInit = XRSessionInit(immersiveAr: true); as option parameter in requestSession
+  //   FlutterWebXr().startSession().then(allowInterop((session) async {
+  //     setState(() => xrSession = session);
 
-      final xrLayer = XRWebGLLayer(session, gl);
+  //     final xrLayer = XRWebGLLayer(session, gl);
 
-      // Create a XRRenderStateInit object with xrLayer as the baseLayer
-      final renderStateInit = XRRenderStateInit(baseLayer: xrLayer);
+  //     // Create a XRRenderStateInit object with xrLayer as the baseLayer
+  //     final renderStateInit = XRRenderStateInit(baseLayer: xrLayer);
 
-      // Pass the XRRenderStateInit object to updateRenderState
-      callMethod(session, 'updateRenderState', [renderStateInit]);
+  //     // Pass the XRRenderStateInit object to updateRenderState
+  //     callMethod(session, 'updateRenderState', [renderStateInit]);
 
-      // request the reference space
-      const xrReferenceSpaceType = 'local';
-      var xrReferenceSpace = await promiseToFuture(
-          callMethod(session, 'requestReferenceSpace', [xrReferenceSpaceType]));
+  //     // request the reference space
+  //     const xrReferenceSpaceType = 'local';
+  //     var xrReferenceSpace = await promiseToFuture(
+  //         callMethod(session, 'requestReferenceSpace', [xrReferenceSpaceType]));
 
-      // register XR-Frame-Handler
-      startFrameHandler() {
-        callMethod(session, 'requestAnimationFrame', [
-          allowInterop((time, xrFrame) {
-            // initSize(context);
-            // test1(xrFrame);
-            // render();
-            startFrameHandler();
-          })
-        ]);
-      }
+  //     // register XR-Frame-Handler
+  //     startFrameHandler() {
+  //       callMethod(session, 'requestAnimationFrame', [
+  //         allowInterop((time, xrFrame) {
+  //           // initSize(context);
+  //           // test1(xrFrame);
+  //           // render();
+  //           startFrameHandler();
+  //         })
+  //       ]);
+  //     }
 
-      startFrameHandler();
-    }));
+  //     startFrameHandler();
+  //   }));
 
-    // initPlatformState();
-  }
+  //   // initPlatformState();
+  // }
 
   // second function to be called
   // Platform messages are asynchronous, so we initialize in an async method.
