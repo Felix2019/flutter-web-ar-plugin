@@ -15,9 +15,10 @@ class PerspectiveCamera {
   external bool get matrixAutoUpdate;
   external void updateMatrixWorld(bool value);
   external void updateProjectionMatrix();
+  external void lookAt(Position vector);
   external bool get isPerspectiveCamera;
-  external Object get matrix;
-  external get projectionMatrix;
+  external Matrix4 get matrix;
+  external Matrix4 get projectionMatrix;
   external set quaternion(dynamic value);
 }
 

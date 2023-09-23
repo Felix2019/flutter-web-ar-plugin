@@ -1,17 +1,17 @@
-import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
 import 'package:flutter_web_xr/src/threejs/interop/utilities.dart';
 import 'package:flutter_web_xr/utils.dart';
 
 abstract class ThreeScene {
-  void addElement(Mesh object);
+  void createScene();
+  void addElement(Object object);
 }
 
 class SceneController implements ThreeScene {
-  final Scene scene = Scene();
-  final List<Mesh> _objects = [];
+  late Scene scene;
+  final List<Object> _objects = [];
 
-  List<Mesh> get activeObjects => _objects;
+  List<Object> get activeObjects => _objects;
 
   set backgroundColor(Color color) => scene.background = color;
 
@@ -20,8 +20,13 @@ class SceneController implements ThreeScene {
   }
 
   @override
-  void addElement(Mesh object) {
+  void addElement(Object object) {
     scene.add(object);
     _objects.add(object);
+  }
+
+  @override
+  void createScene() {
+    scene = Scene();
   }
 }

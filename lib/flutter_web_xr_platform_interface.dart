@@ -23,7 +23,7 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
+  String? getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
@@ -31,7 +31,7 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError('getBatteryLevel() has not been implemented.');
   }
 
-  Future<bool> isWebXrAvailable() {
+  bool isWebXrAvailable() {
     throw UnimplementedError("isWebXrAvailable() has not been implemented.");
   }
 

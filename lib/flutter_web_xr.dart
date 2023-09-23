@@ -1,7 +1,7 @@
 import 'flutter_web_xr_platform_interface.dart';
 
 class FlutterWebXr {
-  Future<String?> getPlatformVersion() {
+  String? getPlatformVersion() {
     return FlutterWebXrPlatform.instance.getPlatformVersion();
   }
 
@@ -9,7 +9,7 @@ class FlutterWebXr {
     return FlutterWebXrPlatform.instance.getBatteryLevel();
   }
 
-  Future<bool> isWebXrAvailable() {
+  bool isWebXrAvailable() {
     return FlutterWebXrPlatform.instance.isWebXrAvailable();
   }
 

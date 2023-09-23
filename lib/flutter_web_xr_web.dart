@@ -6,8 +6,9 @@
 import 'dart:html' as html;
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
+import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
+import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
-import 'package:flutter_web_xr/src/webxr/interop/core.dart';
 import 'package:flutter_web_xr/src/webxr/models/xr_controller.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
@@ -18,10 +19,16 @@ import 'flutter_web_xr_platform_interface.dart';
 
 /// A web implementation of the FlutterWebXrPlatform of the FlutterWebXr plugin.
 class FlutterWebXrWeb extends FlutterWebXrPlatform {
-  FlutterWebXrWeb();
+  late XRController xrController;
 
-  final XRController xrController = XRController();
-  // final SceneController sceneController = SceneController();
+  final RendererController rendererController = RendererController.create();
+  final SceneController sceneController = SceneController();
+  final CameraController cameraController = CameraController();
+
+  FlutterWebXrWeb() {
+    xrController =
+        XRController(rendererController, sceneController, cameraController);
+  }
 
   static void registerWith(Registrar registrar) {
     FlutterWebXrPlatform.instance = FlutterWebXrWeb();
@@ -29,7 +36,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
 
   //Returns a [String] containing the version of the platform.
   @override
-  Future<String?> getPlatformVersion() async => html.window.navigator.userAgent;
+  String? getPlatformVersion() => html.window.navigator.userAgent;
 
   /// Determines if the current browser is compatible based on the user agent string.
   ///
@@ -59,18 +66,18 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   /// @return A `Future<bool>` that returns true if WebXR is available
   /// and compatible; otherwise `false`.
   @override
-  Future<bool> isWebXrAvailable() async {
-    bool isWebXrAvailable = isWebXrSupported();
+  bool isWebXrAvailable() {
+    bool isWebXrAvailable = xrController.isWebXrSupported();
 
-    if (isWebXrAvailable) {
-      String userAgent =
-          await getPlatformVersion() ?? 'Unknown platform version';
+    if (!isWebXrAvailable) return false;
+    return checkRequirements();
+  }
 
-      bool isCompatible = isBrowserCompatible(userAgent) && isMobileDevice();
-      return isCompatible;
-    } else {
-      return false;
-    }
+  bool checkRequirements() {
+    String userAgent = getPlatformVersion() ?? 'Unknown platform version';
+
+    bool isCompatible = isBrowserCompatible(userAgent) && isMobileDevice();
+    return isCompatible;
   }
 
   @override
@@ -82,33 +89,43 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     }
   }
 
+  setupThreeJs() {
+    rendererController.initRenderer();
+    sceneController.createScene();
+    cameraController.initCamera();
+  }
+
   @override
   void createCube() {
-    xrController.addElement();
-    // final BoxGeometry geometry = BoxGeometry(1, 1, 1);
-    // final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
+    setupThreeJs();
 
-    // final materials = [
-    //   MeshBasicMaterial(jsify({'color': 0xff0000})),
-    //   MeshBasicMaterial(jsify({'color': 0x0000ff})),
-    //   MeshBasicMaterial(jsify({'color': 0x00ff00})),
-    //   MeshBasicMaterial(jsify({'color': 0xff00ff})),
-    //   MeshBasicMaterial(jsify({'color': 0x00ffff})),
-    //   MeshBasicMaterial(jsify({'color': 0xffff00}))
-    // ];
+    Future.delayed(const Duration(seconds: 4), () {
+      final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
 
-    // final Mesh object = Mesh(geometry, materials);
-    // // object.position.x = 0;
-    // // object.position.y = 0;
-    // object.position.z = -1;
+      final materials = [
+        MeshBasicMaterial(jsify({'color': 0xff0000})),
+        MeshBasicMaterial(jsify({'color': 0x0000ff})),
+        MeshBasicMaterial(jsify({'color': 0x00ff00})),
+        MeshBasicMaterial(jsify({'color': 0xff00ff})),
+        MeshBasicMaterial(jsify({'color': 0x00ffff})),
+        MeshBasicMaterial(jsify({'color': 0xffff00}))
+      ];
 
-    // object.rotation.x += 7;
-    // object.rotation.y += 7;
+      final Mesh object = Mesh(geometry, materials);
+      object.position.x = 0;
+      object.position.y = 0;
+      object.position.z = -1;
 
-    // xrController.sceneController.addElement(object);
+      object.rotation.x += 7;
+      object.rotation.y += 7;
+
+      sceneController.addElement(object);
+    });
   }
 
   void multiplyObject() {
+    setupThreeJs();
+
     const rowCount = 4;
     const half = rowCount / 2;
 
@@ -138,46 +155,32 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
           object.rotation.x += 7;
           object.rotation.y += 7;
 
-          xrController.sceneController.addElement(object);
-          // sceneController.addElement(object);
+          sceneController.addElement(object);
         }
       }
     }
   }
 
-  html.DivElement overlay = html.DivElement()
-    ..id = 'ar-overlay'
-    ..style.position = 'absolute'
-    ..style.top = '0'
-    ..style.left = '0'
-    ..style.width = '100%'
-    ..style.height = '100%'
-    ..style.zIndex = '100000'
-    ..style.backgroundColor = "red"
-    ..innerText = 'Hier ist das AR DOM Overlay!';
+  //  void render() {
+  //   final List<Mesh> activeObjects = sceneController.activeObjects;
+
+  //   for (var i = 0; i < activeObjects.length; i++) {
+  //     final Mesh object = activeObjects[i];
+  //     meshController.rotateObject(object, xValue: 0.03, yValue: 0.03);
+  //   }
+
+  //   rendererController.render(
+  //       sceneController.scene, cameraController.perspectiveCamera);
+  // }
 
   @override
   Future<void> startSession() async {
     try {
+      // setupThreeJs();
       // multiplyObject();
-
-      // createCube();
 
       await xrController.requestSession();
       xrController.startFrameHandler();
-
-      // html.document.body!.children.add(overlay);
-
-      // overlay.onClick.listen((event) {
-      //   print('Overlay angeklickt!');
-      // });
-
-      // createCube();
-      // xrController.rendererController.render();
-
-      // Future.delayed(Duration(seconds: 2), () async {
-      //   createCube();
-      // });
     } catch (e) {
       throw Exception('operation failed');
     }

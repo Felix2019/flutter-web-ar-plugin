@@ -9,10 +9,10 @@ class MethodChannelFlutterWebXr extends FlutterWebXrPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_web_xr');
 
-  @override
-  Future<String?> getPlatformVersion() async {
-    final version =
-        await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
-  }
+  // @override
+  // Future<String?> getPlatformVersion() async {
+  //   final version =
+  //       await methodChannel.invokeMethod<String>('getPlatformVersion');
+  //   return version;
+  // }
 }

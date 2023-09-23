@@ -2,11 +2,10 @@ import 'dart:js_util';
 
 import 'package:flutter_web_xr/src/threejs/interfaces/renderer_operations.dart';
 import 'package:flutter_web_xr/src/threejs/interop/base.dart';
+import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
 import 'dart:html' as html;
 import 'dart:ui' as ui;
 
-import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
-import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
 import 'package:flutter_web_xr/utils.dart';
 
 class RendererController implements RendererOperations {
@@ -21,21 +20,15 @@ class RendererController implements RendererOperations {
     ..style.height = '100%'
     ..style.backgroundColor = 'blue';
 
-  late SceneController sceneController;
-  late CameraController cameraController;
-
   RendererController._() {
     domLog("create renderer controller");
 
     _registerCanvas();
-
-    sceneController = SceneController();
-    cameraController = CameraController();
   }
 
   factory RendererController.create() {
     final controller = RendererController._();
-    controller._initRenderer();
+    // controller._initRenderer();
     return controller;
   }
 
@@ -50,7 +43,7 @@ class RendererController implements RendererOperations {
     }
   }
 
-  Future<void> _initRenderer() async {
+  void initRenderer() async {
     try {
       _gl = _canvas.getContext('webgl', {'xrCompatible': true});
 
@@ -70,8 +63,8 @@ class RendererController implements RendererOperations {
   }
 
   @override
-  void render() => renderer.render(
-      sceneController.scene, cameraController.perspectiveCamera);
+  void render(Scene scene, PerspectiveCamera camera) =>
+      renderer.render(scene, camera);
 
   @override
   void setSize(num width, num height) => renderer.setSize(width, height);
