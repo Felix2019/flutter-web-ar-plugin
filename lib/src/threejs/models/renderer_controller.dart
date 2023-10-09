@@ -1,51 +1,27 @@
 import 'dart:js_util';
 
 import 'package:flutter_web_xr/src/threejs/interfaces/renderer_operations.dart';
-import 'package:flutter_web_xr/src/threejs/interop/base.dart';
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
 import 'dart:html' as html;
-import 'dart:ui' as ui;
-
-import 'package:flutter_web_xr/utils.dart';
 
 class RendererController implements RendererOperations {
   late WebGLRenderer renderer;
   late Object? _gl;
-  final String _createdViewId = 'canvas';
 
   Object? get glObject => _gl;
 
   final html.CanvasElement _canvas = html.CanvasElement()
     ..style.width = '100%'
-    ..style.height = '100%'
-    ..style.backgroundColor = 'blue';
+    ..style.height = '100%';
 
-  RendererController._() {
-    domLog("create renderer controller");
-
-    _registerCanvas();
+  RendererController() {
+    _initRenderer();
   }
 
-  factory RendererController.create() {
-    final controller = RendererController._();
-    // controller._initRenderer();
-    return controller;
-  }
-
-  void _registerCanvas() {
-    try {
-      // Register div as a view and ensure the div is ready before we try to use it
-      // ignore: undefined_prefixed_name
-      ui.platformViewRegistry
-          .registerViewFactory(_createdViewId, (int viewId) => _canvas);
-    } catch (e) {
-      throw Exception('Failed to register canvas: $e');
-    }
-  }
-
-  void initRenderer() async {
+  void _initRenderer() {
     try {
       _gl = _canvas.getContext('webgl', {'xrCompatible': true});
+      if (_gl == null) throw Exception('Failed to get WebGL context');
 
       final Object options = jsify({
         'context': _gl,
@@ -58,7 +34,7 @@ class RendererController implements RendererOperations {
       renderer.autoClear = false;
       renderer.xr.enabled = true;
     } catch (e) {
-      throw Exception('Failed to initialize renderer: $e');
+      rethrow;
     }
   }
 

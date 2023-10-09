@@ -1,3 +1,5 @@
+import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
+
 import 'flutter_web_xr_platform_interface.dart';
 
 class FlutterWebXr {
@@ -21,8 +23,22 @@ class FlutterWebXr {
     return FlutterWebXrPlatform.instance.endSession();
   }
 
-  void createCube() {
-    return FlutterWebXrPlatform.instance.createCube();
+  void createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
+    return FlutterWebXrPlatform.instance.createObject(geometry, materials);
+  }
+
+  void createCube(
+      {required double sideLength, List<MeshBasicMaterial>? materials}) {
+    return FlutterWebXrPlatform.instance
+        .createCube(sideLength: sideLength, materials: materials);
+  }
+
+  void createCone(
+      {required double radius,
+      required double height,
+      List<MeshBasicMaterial>? materials}) {
+    return FlutterWebXrPlatform.instance
+        .createCone(radius: radius, height: height, materials: materials);
   }
 
   void jsPrint(String message) {

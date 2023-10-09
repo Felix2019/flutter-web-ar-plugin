@@ -19,7 +19,8 @@ class Home extends StatelessWidget {
 
   Future<void> startXRSession() async {
     try {
-      _flutterWebXrPlugin.createCube();
+      // _flutterWebXrPlugin.createCube(sideLength: 0.2);
+      _flutterWebXrPlugin.createCone(radius: 0.2, height: 0.6);
       await _flutterWebXrPlugin.startSession();
     } catch (e) {
       throw Exception('Failed to start web xr session');

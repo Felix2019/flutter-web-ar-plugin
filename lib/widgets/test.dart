@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'dart:html' as html;
 import 'dart:ui' as ui;
 
-import 'package:flutter_web_xr/src/threejs/interop/base.dart';
 import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
 import 'package:flutter_web_xr/src/webxr/interop/core.dart';

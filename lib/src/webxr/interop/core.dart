@@ -10,9 +10,6 @@ class XRSystem {
   external bool isSessionSupported(String mode);
 }
 
-@JS('navigator.xr.requestSession')
-external dynamic startSession(String sessionType);
-
 @JS('XRReferenceSpace')
 class XRReferenceSpace {}
 

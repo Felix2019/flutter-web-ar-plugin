@@ -12,7 +12,6 @@ import 'package:flutter_web_xr/src/webxr/interop/xr_frame.dart';
 import 'package:flutter_web_xr/src/webxr/interop/xr_render_state.dart';
 import 'package:flutter_web_xr/src/webxr/interop/xr_session.dart';
 import 'package:flutter_web_xr/src/webxr/interop/xr_web_gl_layer.dart';
-import 'package:flutter_web_xr/utils.dart';
 
 class XRController {
   final RendererController rendererController;
@@ -25,9 +24,7 @@ class XRController {
   late XRWebGLLayer baseLayer;
 
   XRController(
-      this.rendererController, this.sceneController, this.cameraController) {
-    domLog("create xr controller");
-  }
+      this.rendererController, this.sceneController, this.cameraController);
 
   bool isWebXrSupported() => xrSystem != null;
 
@@ -99,13 +96,11 @@ class XRController {
       throw Exception('WebXR Session not supported');
     }
 
-    // final Map<String, dynamic> sessionOptions = setupXrDomOverlay();
+    final Map<String, dynamic> sessionOptions = setupXrDomOverlay();
 
     try {
       xrSession = await promiseToFuture(
-          xrSystem!.requestSession("immersive-ar", jsify({})));
-      // xrSession = await promiseToFuture(
-      //     xrSystem!.requestSession("immersive-ar", jsify(sessionOptions)));
+          xrSystem!.requestSession("immersive-ar", jsify(sessionOptions)));
 
       await setupXRSession();
     } catch (e) {
@@ -157,7 +152,7 @@ class XRController {
 
   void frameHandler(double time, XRFrame xrFrame) {
     startFrameHandler();
-    bindGraphicsFramebuffer(xrSession);
+    bindGraphicsFramebuffer();
 
     final XRViewerPose? pose = getViewerPose(xrFrame);
 
@@ -168,7 +163,7 @@ class XRController {
   }
 
   // Bind the graphics framebuffer to the baseLayer's framebuffer.
-  void bindGraphicsFramebuffer(XRSession xrSession) {
+  void bindGraphicsFramebuffer() {
     // Get the baseLayer from the xrSession
     baseLayer = xrSession.renderState.baseLayer;
 
@@ -197,14 +192,15 @@ class XRController {
         sceneController.scene, cameraController.perspectiveCamera);
   }
 
-  Future<void> configureCameraForView(XRFrame view) async {
+  void configureCameraForView(XRFrame view) {
     List<double> matrix = view.transform.matrix;
+    List<double> projectionMatrix = view.projectionMatrix;
 
     // Use the view's transform matrix and projection matrix to configure the THREE.camera.
     final PerspectiveCamera camera = cameraController.perspectiveCamera;
 
     camera.matrix.fromArray(matrix);
-    camera.projectionMatrix.fromArray(view.projectionMatrix);
+    camera.projectionMatrix.fromArray(projectionMatrix);
     camera.updateMatrixWorld(true);
   }
 }

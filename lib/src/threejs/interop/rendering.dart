@@ -2,9 +2,25 @@
 library rendering;
 
 import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
+import 'package:flutter_web_xr/src/webxr/interop/core.dart';
+import 'package:flutter_web_xr/utils.dart';
 import 'package:js/js.dart';
+import 'dart:html' as html;
 
 import 'utilities.dart';
+
+@JS('WebGLRenderer')
+class WebGLRenderer {
+  external factory WebGLRenderer([Object options]);
+  external html.CanvasElement get domElement;
+  external void render(Scene scene, dynamic camera);
+  external XR get xr;
+  external void setSize(num width, num height);
+  external set autoClear(bool value);
+  external clear([bool color, bool depth, bool stencil]);
+  external WebGL2RenderingContext getContext();
+  external void dispose();
+}
 
 @JS('PerspectiveCamera')
 class PerspectiveCamera {

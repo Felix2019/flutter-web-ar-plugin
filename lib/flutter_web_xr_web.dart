@@ -9,6 +9,7 @@ import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
+import 'package:flutter_web_xr/src/threejs/utils.dart';
 import 'package:flutter_web_xr/src/webxr/models/xr_controller.dart';
 import 'package:flutter_web_xr/utils.dart';
 import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
@@ -21,13 +22,17 @@ import 'flutter_web_xr_platform_interface.dart';
 class FlutterWebXrWeb extends FlutterWebXrPlatform {
   late XRController xrController;
 
-  final RendererController rendererController = RendererController.create();
+  final RendererController rendererController = RendererController();
   final SceneController sceneController = SceneController();
   final CameraController cameraController = CameraController();
 
   FlutterWebXrWeb() {
-    xrController =
-        XRController(rendererController, sceneController, cameraController);
+    try {
+      xrController =
+          XRController(rendererController, sceneController, cameraController);
+    } catch (e) {
+      throw Exception('Failed to instantiate XRController: $e');
+    }
   }
 
   static void registerWith(Registrar registrar) {
@@ -47,7 +52,8 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   /// @param userAgent The user agent string to be checked for compatibility.
   /// @return `true` if the browser is either Chrome or Edge, otherwise `false`.
   bool isBrowserCompatible(String userAgent) =>
-      userAgent.contains('Chrome') || userAgent.contains('Edg');
+      userAgent.toLowerCase().contains('chrome') ||
+      userAgent.toLowerCase().contains('edg');
 
   // The viewport is less than 768 pixels wide
   /// Determines if the current device is a mobile device based on its width.
@@ -81,65 +87,41 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  Future<void> endSession() async {
-    try {
-      await xrController.endSession();
-    } catch (e) {
-      throw Exception('Failed to end session');
-    }
-  }
-
-  setupThreeJs() {
-    rendererController.initRenderer();
-    sceneController.createScene();
-    cameraController.initCamera();
-  }
-
-  @override
-  void createCube() {
-    setupThreeJs();
-
-    Future.delayed(const Duration(seconds: 4), () {
-      final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
-
-      final materials = [
-        MeshBasicMaterial(jsify({'color': 0xff0000})),
-        MeshBasicMaterial(jsify({'color': 0x0000ff})),
-        MeshBasicMaterial(jsify({'color': 0x00ff00})),
-        MeshBasicMaterial(jsify({'color': 0xff00ff})),
-        MeshBasicMaterial(jsify({'color': 0x00ffff})),
-        MeshBasicMaterial(jsify({'color': 0xffff00}))
-      ];
-
-      final Mesh object = Mesh(geometry, materials);
-      object.position.x = 0;
-      object.position.y = 0;
+  void createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
+    Future.delayed(const Duration(seconds: 2), () {
+      final Mesh object = Mesh(geometry, materials ?? createMaterials());
       object.position.z = -1;
-
       object.rotation.x += 7;
       object.rotation.y += 7;
 
       sceneController.addElement(object);
+      domLog(sceneController.activeObjects);
     });
   }
 
-  void multiplyObject() {
-    setupThreeJs();
+  @override
+  void createCube(
+      {required double sideLength, List<MeshBasicMaterial>? materials}) {
+    final BoxGeometry geometry =
+        BoxGeometry(sideLength, sideLength, sideLength);
+    createObject(geometry, materials);
+  }
 
+  @override
+  void createCone(
+      {required double radius,
+      required double height,
+      List<MeshBasicMaterial>? materials}) {
+    final ConeGeometry geometry = ConeGeometry(radius, height, 32);
+    createObject(geometry, materials);
+  }
+
+  void multiplyObject() {
     const rowCount = 4;
     const half = rowCount / 2;
 
     final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
-    // final BoxGeometry geometry = BoxGeometry(2, 2, 2);
-
-    final materials = [
-      MeshBasicMaterial(jsify({'color': 0xff0000})),
-      MeshBasicMaterial(jsify({'color': 0x0000ff})),
-      MeshBasicMaterial(jsify({'color': 0x00ff00})),
-      MeshBasicMaterial(jsify({'color': 0xff00ff})),
-      MeshBasicMaterial(jsify({'color': 0x00ffff})),
-      MeshBasicMaterial(jsify({'color': 0xffff00}))
-    ];
+    final List<MeshBasicMaterial> materials = createMaterials();
 
     for (var i = 0; i < rowCount; i++) {
       for (var j = 0; j < rowCount; j++) {
@@ -150,8 +132,6 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
           object.position.y = j - half;
           object.position.z = k - half;
 
-          domLog(object.position);
-
           object.rotation.x += 7;
           object.rotation.y += 7;
 
@@ -161,54 +141,30 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     }
   }
 
-  //  void render() {
-  //   final List<Mesh> activeObjects = sceneController.activeObjects;
-
-  //   for (var i = 0; i < activeObjects.length; i++) {
-  //     final Mesh object = activeObjects[i];
-  //     meshController.rotateObject(object, xValue: 0.03, yValue: 0.03);
-  //   }
-
-  //   rendererController.render(
-  //       sceneController.scene, cameraController.perspectiveCamera);
-  // }
-
   @override
   Future<void> startSession() async {
     try {
-      // setupThreeJs();
-      // multiplyObject();
-
       await xrController.requestSession();
       xrController.startFrameHandler();
     } catch (e) {
-      throw Exception('operation failed');
+      throw Exception('Failed to start xr session');
     }
   }
 
-  Future initSession() async {
-    // call from web xr manager
+  @override
+  Future<void> endSession() async {
+    try {
+      await xrController.endSession();
+    } catch (e) {
+      throw Exception('Failed to end session');
+    }
   }
 
   @override
   void jsPrint(dynamic message) => domLog(message);
 
   @override
-  void test() {
-    jsPrint("test function");
-    var pos = Position(2, 2, 2);
-
-    // log(pos.x);
-
-    // jsObj.getSet1 = 2;
-    // var a = jsObj.getSet;
-    // jsObj.method();
-    // var myObject1 = MyObject()
-    // myObject1.x = 10;
-    // myObject1.y = 20;
-
-    // print(stringify(myObject1));
-  }
+  void test() {}
 
   /// Retrieves the battery level of the device.
   ///
@@ -240,4 +196,16 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
       throw Exception('Failed to fetch battery level');
     }
   }
+
+  //  void render() {
+  //   final List<Mesh> activeObjects = sceneController.activeObjects;
+
+  //   for (var i = 0; i < activeObjects.length; i++) {
+  //     final Mesh object = activeObjects[i];
+  //     meshController.rotateObject(object, xValue: 0.03, yValue: 0.03);
+  //   }
+
+  //   rendererController.render(
+  //       sceneController.scene, cameraController.perspectiveCamera);
+  // }
 }

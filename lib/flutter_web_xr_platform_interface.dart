@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_web_xr_method_channel.dart';
@@ -43,8 +45,20 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("endSession() has not been implemented.");
   }
 
-  void createCube() {
+  void createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
+    throw UnimplementedError("createObject() has not been implemented.");
+  }
+
+  void createCube(
+      {required double sideLength, List<MeshBasicMaterial>? materials}) {
     throw UnimplementedError("createCube() has not been implemented.");
+  }
+
+  void createCone(
+      {required double radius,
+      required double height,
+      List<MeshBasicMaterial>? materials}) {
+    throw UnimplementedError("createCone() has not been implemented.");
   }
 
   void jsPrint(dynamic message) {

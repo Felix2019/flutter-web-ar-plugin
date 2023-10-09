@@ -11,7 +11,7 @@ class MeshBasicMaterial {
 
 @JS('Mesh')
 class Mesh {
-  external Mesh(BoxGeometry geometry, List<MeshBasicMaterial> material);
+  external Mesh(dynamic geometry, List<MeshBasicMaterial> material);
   external Rotation get rotation;
   external Scale get scale;
   external Position get position;
@@ -21,4 +21,9 @@ class Mesh {
 @JS('BoxGeometry')
 class BoxGeometry {
   external BoxGeometry(num width, num height, num depth);
+}
+
+@JS('ConeGeometry')
+class ConeGeometry {
+  external ConeGeometry(num radius, num height, num radialSegments);
 }
