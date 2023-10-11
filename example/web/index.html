@@ -40,10 +40,52 @@
     </script> -->
     <!-- window.THREE = THREE; -->
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"
+
+    <script type="module">
+      import * as THREE from 'https://unpkg.com/three@0.157.0/build/three.module.js';
+    
+      // Sie könnten globale Funktionen oder Objekte hier definieren,
+      // die dann über Dart-JS-Interop zugänglich sind.
+      window.THREE = THREE;
+    </script>
+    
+
+    <!-- <script
+      src="https://unpkg.com/three@0.157.0/build/three.min.js"
       defer
-    ></script>
+    ></script> -->
+
+    <!-- "https://unpkg.com/three@0.155.0/build/three.min.js" -->
+
+    <!-- src="https://cdn.jsdelivr.net/npm/three@0.155.0/addons/loaders/GLTFLoader.js" -->
+    <!-- src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/jsm/loaders/GLTFLoader.js" -->
+
+    <!-- <script>
+      const THREE = require("three");
+      window.GLTFLoader = THREE.GLTFLoader;
+    </script> -->
+
+    <!-- <script
+    src="https://unpkg.com/three@0.155.0/examples/jsm/"
+    defer
+  ></script> -->
+
+    <!-- import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; -->
+
+    <!-- <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js",
+          "three/addons/": "https://unpkg.com/three@0.155.0/examples/jsm/"
+        }
+      }
+    </script> -->
+
+    <!-- <script type="module">
+      import * as THREE from "https://threejs.org/build/three.module.js";
+      import { GLTFLoader } from "https://threejs.org/examples/jsm/loaders/GLTFLoader.js";
+     
+    </script> -->
 
     <script>
       function createAlert(message) {

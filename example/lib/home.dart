@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'package:flutter_web_xr_example/battery_page.dart';
 import 'package:flutter_web_xr_example/threeJs.dart';
+import 'package:flutter_web_xr/widgets/object_selector.dart';
+import 'package:flutter_web_xr/widgets/start_button.dart';
 
 class Home extends StatelessWidget {
   final _flutterWebXrPlugin = FlutterWebXr();
@@ -19,8 +21,8 @@ class Home extends StatelessWidget {
 
   Future<void> startXRSession() async {
     try {
-      // _flutterWebXrPlugin.createCube(sideLength: 0.2);
-      _flutterWebXrPlugin.createCone(radius: 0.2, height: 0.6);
+      _flutterWebXrPlugin.createCube(sideLength: 0.2);
+      // _flutterWebXrPlugin.createCone(radius: 0.2, height: 0.6);
       await _flutterWebXrPlugin.startSession();
     } catch (e) {
       throw Exception('Failed to start web xr session');
@@ -78,16 +80,16 @@ class Home extends StatelessWidget {
               return Center(child: Text(snapshot.error.toString()));
             } else {
               if (snapshot.data == true) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () async => await startXRSession(),
-                          child: const Text("start ar session")),
-                    ],
-                  ),
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Expanded(child: ObjectSelector()),
+                    StartButton(),
+                    ElevatedButton(
+                        onPressed: () async => await startXRSession(),
+                        child: const Text("start ar session")),
+                  ],
                 );
               } else {
                 return const Center(child: Text('WebXR not supported'));

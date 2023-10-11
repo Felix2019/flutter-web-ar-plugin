@@ -9,10 +9,9 @@ import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
-import 'package:flutter_web_xr/src/threejs/utils.dart';
+import 'package:flutter_web_xr/src/threejs/three_utils.dart';
 import 'package:flutter_web_xr/src/webxr/models/xr_controller.dart';
-import 'package:flutter_web_xr/utils.dart';
-import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
+import 'package:flutter_web_xr/src/utils/interop_utils.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'dart:js_util';
 
@@ -21,13 +20,20 @@ import 'flutter_web_xr_platform_interface.dart';
 /// A web implementation of the FlutterWebXrPlatform of the FlutterWebXr plugin.
 class FlutterWebXrWeb extends FlutterWebXrPlatform {
   late XRController xrController;
+  late RendererController rendererController;
 
-  final RendererController rendererController = RendererController();
+  final html.CanvasElement canvas = html.CanvasElement()
+    ..style.width = '100%'
+    ..style.height = '100%';
+
   final SceneController sceneController = SceneController();
-  final CameraController cameraController = CameraController();
+  final CameraController cameraController =
+      CameraController(matrixAutoUpdate: false);
 
   FlutterWebXrWeb() {
     try {
+      rendererController = RendererController(canvas: canvas);
+
       xrController =
           XRController(rendererController, sceneController, cameraController);
     } catch (e) {
@@ -89,19 +95,18 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   @override
   void createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
     Future.delayed(const Duration(seconds: 2), () {
-      final Mesh object = Mesh(geometry, materials ?? createMaterials());
+      final Mesh object =
+          Mesh(geometry, materials ?? ThreeUtils.createMaterials());
       object.position.z = -1;
       object.rotation.x += 7;
       object.rotation.y += 7;
 
       sceneController.addElement(object);
-      domLog(sceneController.activeObjects);
     });
   }
 
   @override
-  void createCube(
-      {required double sideLength, List<MeshBasicMaterial>? materials}) {
+  createCube({required double sideLength, List<MeshBasicMaterial>? materials}) {
     final BoxGeometry geometry =
         BoxGeometry(sideLength, sideLength, sideLength);
     createObject(geometry, materials);
@@ -121,7 +126,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     const half = rowCount / 2;
 
     final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
-    final List<MeshBasicMaterial> materials = createMaterials();
+    final List<MeshBasicMaterial> materials = ThreeUtils.createMaterials();
 
     for (var i = 0; i < rowCount; i++) {
       for (var j = 0; j < rowCount; j++) {
