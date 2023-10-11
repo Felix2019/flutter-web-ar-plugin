@@ -1,10 +1,6 @@
 @JS('THREE')
 library rendering;
 
-// import * as THREE from 'three';
-// import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
 import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
 import 'package:flutter_web_xr/src/webxr/interop/core.dart';
 import 'package:flutter_web_xr/src/utils/interop_utils.dart';
@@ -49,10 +45,3 @@ class Scene {
   external void clear();
   external set background(Color? color);
 }
-
-// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-// @JS('GLTFLoader')
-// class GLTFLoader {
-//   external factory GLTFLoader();
-//   external dynamic load(String url);
-// }

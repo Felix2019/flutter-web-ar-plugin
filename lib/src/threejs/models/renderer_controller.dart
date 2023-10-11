@@ -1,9 +1,9 @@
 import 'dart:js_util';
 
 import 'package:flutter_web_xr/src/threejs/interfaces/renderer_operations.dart';
+import 'package:flutter_web_xr/src/threejs/interop/loaders.dart';
 import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
-import 'package:flutter_web_xr/src/threejs/interop/test1.dart';
 import 'dart:html' as html;
 
 import 'package:flutter_web_xr/src/threejs/models/mesh_controller.dart';
@@ -22,8 +22,8 @@ class RendererController implements RendererOperations {
   RendererController({required this.canvas}) {
     initRenderer(canvas);
 
-    // final loader = GLTFLoader();
-    // domLog(loader);
+    final loader = GLTFLoader();
+    domLog(loader);
   }
 
   @override
