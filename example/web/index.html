@@ -35,16 +35,28 @@
     <title>flutter_web_xr_example</title>
     <link rel="manifest" href="manifest.json" />
 
-    <script type="module">
+    <script type="module" defer>
       import * as THREE from "https://jspm.dev/three";
       import { GLTFLoader } from "https://jspm.dev/three/addons/loaders/GLTFLoader.js";
+      // import { DRACOLoader } from "https://jspm.dev/three/addons/loaders/DRACOLoader.js";
+
+      // import { GLTFLoader } from './three/addons/loaders/GLTFLoader.js';
+
+      //import * as THREE from "https://esm.run/three";
+      //import { GLTFLoader } from "https://esm.run/three/addons/loaders/GLTFLoader.js";
 
       // import * as THREE from  "https://unpkg.com/three@0.155.0/build/three.module.js"
       // import { GLTFLoader } from "https://jspm.dev/three/examples/jsm/loaders/GLTFLoader.js";
+      // import { GLTFLoader } from "https://unpkg.com/three@0.157.0/examples/jsm/loaders/GLTFLoader.js";
 
       window.THREE = THREE;
       window.GLTFLoader = GLTFLoader;
+      // window.DRACOLoader = DRACOLoader;
     </script>
+
+    <!-- not working, does not support es6 modules -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/loaders/GLTFLoader.js" defer></script> -->
 
     <script>
       function createAlert(message) {

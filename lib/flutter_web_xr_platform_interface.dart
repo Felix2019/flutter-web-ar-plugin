@@ -65,6 +65,10 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("log() has not been implemented.");
   }
 
+  void openWindow(String url) {
+    throw UnimplementedError("openWindow() has not been implemented.");
+  }
+
   void test() {
     throw UnimplementedError("test() has not been implemented.");
   }

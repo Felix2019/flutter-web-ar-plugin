@@ -169,6 +169,9 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   void jsPrint(dynamic message) => domLog(message);
 
   @override
+  void openWindow(String url) => html.window.open(url, '_blank');
+
+  @override
   void test() {}
 
   /// Retrieves the battery level of the device.

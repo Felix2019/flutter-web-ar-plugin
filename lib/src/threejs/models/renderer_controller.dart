@@ -1,13 +1,10 @@
 import 'dart:js_util';
 
 import 'package:flutter_web_xr/src/threejs/interfaces/renderer_operations.dart';
-import 'package:flutter_web_xr/src/threejs/interop/loaders.dart';
-import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
 import 'dart:html' as html;
 
-import 'package:flutter_web_xr/src/threejs/models/mesh_controller.dart';
-import 'package:flutter_web_xr/src/utils/interop_utils.dart';
+import 'package:flutter_web_xr/src/threejs/models/object_controller.dart';
 
 class RendererController implements RendererOperations {
   final html.CanvasElement canvas;
@@ -17,13 +14,10 @@ class RendererController implements RendererOperations {
 
   Object? get glObject => _gl;
 
-  final MeshController meshController = MeshController();
+  final ObjectController objectController = ObjectController();
 
   RendererController({required this.canvas}) {
     initRenderer(canvas);
-
-    final loader = GLTFLoader();
-    domLog(loader);
   }
 
   @override
@@ -52,13 +46,14 @@ class RendererController implements RendererOperations {
       renderer.render(scene, camera);
 
   @override
-  void animate(Scene scene, PerspectiveCamera camera, Mesh object) {
+  void animate(Scene scene, PerspectiveCamera camera, dynamic object,
+      double xValue, double yValue) {
     render(scene, camera);
     // animate process
-    meshController.rotateObject(object, xValue: 0.04, yValue: 0.04);
+    objectController.rotateObject(object, xValue: xValue, yValue: yValue);
 
     Future.delayed(const Duration(milliseconds: 40), () {
-      animate(scene, camera, object);
+      animate(scene, camera, object, xValue, yValue);
     });
   }
 

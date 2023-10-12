@@ -45,6 +45,10 @@ class FlutterWebXr {
     return FlutterWebXrPlatform.instance.jsPrint(message);
   }
 
+  void openWindow(String url) {
+    return FlutterWebXrPlatform.instance.openWindow(url);
+  }
+
   void test() {
     return FlutterWebXrPlatform.instance.test();
   }

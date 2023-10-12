@@ -26,11 +26,10 @@ final List<ThreeJSModel> models = [
         object: ThreeUtils.createCone(radius: 0.6, height: 1),
       )),
   ThreeJSModel(
-      name: 'Test',
-      path: '/../../assets/models/cube.glb',
-      scene: ThreeScene(
-        createdViewId: '3',
-        object: ThreeUtils.createCone(radius: 0.2, height: 0.6),
+      name: 'Shiba',
+      scene: const ThreeScene(
+        createdViewId: 'gltfObject',
+        path: 'models/skeleton/scene.gltf',
       )),
 ];
 
@@ -45,6 +44,11 @@ class _ObjectSelectorState extends State<ObjectSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    final double itemHeight = size.height / 2.5;
+    final double itemWidth = size.width / 2;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -60,6 +64,7 @@ class _ObjectSelectorState extends State<ObjectSelector> {
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
+              childAspectRatio: (itemWidth / itemHeight),
               children: models.map((model) {
                 return ObjectContainer(
                     model: model, onSelect: () => _handleSelect);
@@ -110,7 +115,7 @@ class _ObjectContainerState extends State<ObjectContainer> {
                   label: Text(widget.model.name, maxLines: 1),
                 ),
               ),
-              // select
+              // select button
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Row(

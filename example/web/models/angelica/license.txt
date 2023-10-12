@@ -1,0 +1,11 @@
+Model Information:
+* title:	Angelica
+* source:	https://sketchfab.com/3d-models/angelica-27f75fa94c384000bb6a79a3000f8e80
+* author:	NikZava284 ✓ (https://sketchfab.com/NikZava284)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Angelica" (https://sketchfab.com/3d-models/angelica-27f75fa94c384000bb6a79a3000f8e80) by NikZava284 ✓ (https://sketchfab.com/NikZava284) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
