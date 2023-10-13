@@ -1,26 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
+import 'package:flutter_web_xr/widgets/three_model.dart';
+import 'package:flutter_web_xr/widgets/three_scene.dart';
 import 'package:flutter_web_xr_example/battery_page.dart';
-import 'package:flutter_web_xr/widgets/object_selector.dart';
-import 'package:flutter_web_xr/widgets/start_button.dart';
+import 'package:flutter_web_xr/widgets/object_grid.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   final FlutterWebXr _flutterWebXrPlugin = FlutterWebXr();
 
-  Home({super.key});
+  late List<ThreeModel> models;
 
-  bool isWebXrSupported() {
+  @override
+  void initState() {
+    super.initState();
+    models = _initializeModels();
+  }
+
+  List<ThreeModel> _initializeModels() {
+    return [
+      ThreeModel(
+        name: 'Cube',
+        startARSession: () async {
+          await startXRSession(
+              context, () => _flutterWebXrPlugin.createCube(sideLength: 0.2));
+        },
+        scene: ThreeScene(
+          createdViewId: 'cube',
+          object: _flutterWebXrPlugin.createCube(sideLength: 1),
+        ),
+      ),
+      ThreeModel(
+          name: 'Cone',
+          startARSession: () async {
+            await startXRSession(context,
+                () => _flutterWebXrPlugin.createCone(radius: 0.2, height: 0.6));
+          },
+          scene: ThreeScene(
+            createdViewId: 'cone',
+            object: _flutterWebXrPlugin.createCone(radius: 0.6, height: 0.8),
+          )),
+      ThreeModel(
+          name: 'Shiba',
+          startARSession: () async {
+            await startXRSession(
+                context,
+                () => _flutterWebXrPlugin
+                    .loadGLTFModel('models/shiba/scene.gltf'));
+          },
+          scene: const ThreeScene(
+            createdViewId: 'gltfObject',
+            path: 'models/shiba/scene.gltf',
+          )),
+    ];
+  }
+
+  bool isWebXrSupported(BuildContext context) {
     try {
       return _flutterWebXrPlugin.isWebXrAvailable();
     } catch (e) {
-      throw Exception('Failed to check web xr availability');
+      _showErrorSnackBar(context, 'Failed to check web xr availability');
+      return false;
     }
   }
 
-  Future<void> startXRSession(BuildContext context) async {
+  Future<void> startXRSession(
+      BuildContext context, Function createObject) async {
     try {
-      _flutterWebXrPlugin.createCube(sideLength: 0.2);
-      // _flutterWebXrPlugin.createCone(radius: 0.2, height: 0.6);
+      createObject();
       await _flutterWebXrPlugin.startSession();
     } catch (e) {
       _showErrorSnackBar(context, 'Failed to start web xr session');
@@ -38,6 +91,7 @@ class Home extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Flutter Web AR Plugin'),
+          scrolledUnderElevation: 0,
           actions: [
             IconButton.filledTonal(
                 onPressed: () {
@@ -58,20 +112,8 @@ class Home extends StatelessWidget {
             const SizedBox(width: 15),
           ],
         ),
-        body: isWebXrSupported()
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Expanded(child: ObjectSelector()),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: StartButton(
-                      onPressed: () async => await startXRSession(context),
-                    ),
-                  ),
-                ],
-              )
+        body: isWebXrSupported(context)
+            ? ObjectGrid(models: models)
             : const Center(child: Text('WebXR not supported')));
   }
 }

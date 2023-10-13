@@ -45,20 +45,24 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("endSession() has not been implemented.");
   }
 
-  void createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
+  Mesh createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
     throw UnimplementedError("createObject() has not been implemented.");
   }
 
-  void createCube(
+  Mesh createCube(
       {required double sideLength, List<MeshBasicMaterial>? materials}) {
     throw UnimplementedError("createCube() has not been implemented.");
   }
 
-  void createCone(
+  Mesh createCone(
       {required double radius,
       required double height,
       List<MeshBasicMaterial>? materials}) {
     throw UnimplementedError("createCone() has not been implemented.");
+  }
+
+  Future<void> loadGLTFModel(String path) async {
+    throw UnimplementedError("loadGLTFModel() has not been implemented.");
   }
 
   void jsPrint(dynamic message) {

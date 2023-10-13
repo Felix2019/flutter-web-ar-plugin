@@ -57,17 +57,18 @@ class _ThreeSceneState extends State<ThreeScene> {
 
     if (widget.path != null) {
       try {
-        dynamic model =
-            await loaderController.loadModel('models/shiba/scene.gltf');
+        Future.delayed(const Duration(seconds: 1), () async {
+          domLog('Loading model...');
 
-        domLog(model);
+          dynamic model =
+              await loaderController.loadModel('./models/shiba/scene.gltf');
 
-        sceneController.addElement(model);
+          sceneController.addElement(model);
 
-        rendererController.animate(sceneController.scene,
-            cameraController.perspectiveCamera, model, 0, 0.04);
+          rendererController.animate(sceneController.scene,
+              cameraController.perspectiveCamera, model, 0, 0.04);
+        });
       } catch (error) {
-        domLog("scheies");
         domLog(error);
       }
     }

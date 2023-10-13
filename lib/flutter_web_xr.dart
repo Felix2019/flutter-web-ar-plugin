@@ -23,22 +23,26 @@ class FlutterWebXr {
     return FlutterWebXrPlatform.instance.endSession();
   }
 
-  void createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
+  Mesh createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
     return FlutterWebXrPlatform.instance.createObject(geometry, materials);
   }
 
-  void createCube(
+  Mesh createCube(
       {required double sideLength, List<MeshBasicMaterial>? materials}) {
     return FlutterWebXrPlatform.instance
         .createCube(sideLength: sideLength, materials: materials);
   }
 
-  void createCone(
+  Mesh createCone(
       {required double radius,
       required double height,
       List<MeshBasicMaterial>? materials}) {
     return FlutterWebXrPlatform.instance
         .createCone(radius: radius, height: height, materials: materials);
+  }
+
+  Future<void> loadGLTFModel(String path) async {
+    return await FlutterWebXrPlatform.instance.loadGLTFModel(path);
   }
 
   void jsPrint(String message) {

@@ -7,6 +7,7 @@ import 'dart:html' as html;
 import 'package:flutter_web_xr/battery_manager.dart';
 import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
+import 'package:flutter_web_xr/src/threejs/models/loader_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
 import 'package:flutter_web_xr/src/threejs/three_utils.dart';
@@ -29,6 +30,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   final SceneController sceneController = SceneController();
   final CameraController cameraController =
       CameraController(matrixAutoUpdate: false);
+  final LoaderController loaderController = LoaderController();
 
   FlutterWebXrWeb() {
     try {
@@ -93,32 +95,32 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  void createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
-    Future.delayed(const Duration(seconds: 2), () {
-      final Mesh object =
-          Mesh(geometry, materials ?? ThreeUtils.createMaterials());
-      object.position.z = -1;
-      object.rotation.x += 7;
-      object.rotation.y += 7;
+  Mesh createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
+    final Mesh object =
+        Mesh(geometry, materials ?? ThreeUtils.createMaterials());
+    object.position.z = -1;
+    object.rotation.x += 7;
+    object.rotation.y += 7;
 
-      sceneController.addElement(object);
-    });
+    sceneController.addElement(object);
+    return object;
   }
 
   @override
-  createCube({required double sideLength, List<MeshBasicMaterial>? materials}) {
+  Mesh createCube(
+      {required double sideLength, List<MeshBasicMaterial>? materials}) {
     final BoxGeometry geometry =
         BoxGeometry(sideLength, sideLength, sideLength);
-    createObject(geometry, materials);
+    return createObject(geometry, materials);
   }
 
   @override
-  void createCone(
+  Mesh createCone(
       {required double radius,
       required double height,
       List<MeshBasicMaterial>? materials}) {
     final ConeGeometry geometry = ConeGeometry(radius, height, 32);
-    createObject(geometry, materials);
+    return createObject(geometry, materials);
   }
 
   void multiplyObject() {
@@ -167,6 +169,20 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
 
   @override
   void jsPrint(dynamic message) => domLog(message);
+
+  @override
+  Future<void> loadGLTFModel(String path) async {
+    try {
+      dynamic model = await loaderController.loadModel(path);
+
+      sceneController.addElement(model);
+
+      rendererController.animate(sceneController.scene,
+          cameraController.perspectiveCamera, model, 0, 0.04);
+    } catch (e) {
+      throw Exception('Failed to load gltf model');
+    }
+  }
 
   @override
   void openWindow(String url) => html.window.open(url, '_blank');

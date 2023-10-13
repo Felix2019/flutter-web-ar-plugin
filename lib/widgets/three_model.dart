@@ -1,10 +1,13 @@
 import 'package:flutter_web_xr/widgets/three_scene.dart';
 
-class ThreeJSModel {
+class ThreeModel {
   final String name;
+  final Function startARSession;
   final ThreeScene scene;
-  bool isSelected;
 
-  ThreeJSModel(
-      {required this.name, required this.scene, this.isSelected = false});
+  ThreeModel({
+    required this.name,
+    required this.startARSession,
+    required this.scene,
+  }) : assert(name.isNotEmpty, 'Model name must not be empty.');
 }
