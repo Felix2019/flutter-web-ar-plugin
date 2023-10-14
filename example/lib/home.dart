@@ -51,7 +51,7 @@ class _HomeState extends State<Home> {
           startARSession: () async {
             await startXRSession(
                 context,
-                () => _flutterWebXrPlugin
+                () async => await _flutterWebXrPlugin
                     .loadGLTFModel('models/shiba/scene.gltf'));
           },
           scene: const ThreeScene(
@@ -76,7 +76,9 @@ class _HomeState extends State<Home> {
       createObject();
       await _flutterWebXrPlugin.startSession();
     } catch (e) {
-      _showErrorSnackBar(context, 'Failed to start web xr session');
+      _flutterWebXrPlugin.jsPrint("err");
+      _showErrorSnackBar(context, e.toString());
+      // _showErrorSnackBar(context, 'Failed to start web xr session');
     }
   }
 

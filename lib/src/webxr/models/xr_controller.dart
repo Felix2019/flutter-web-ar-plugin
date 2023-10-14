@@ -38,55 +38,32 @@ class XRController {
   }
 
   Map<String, dynamic> setupXrDomOverlay() {
-    // main container
-    html.DivElement xrOverlay = html.DivElement()..id = 'xr-overlay';
-
-    // Overlay 1
-    html.DivElement overlay = html.DivElement()
-      ..id = 'ar-overlay'
-      ..style.position = 'absolute'
-      ..style.top = '0'
-      ..style.left = '0'
-      // ..style.width = '25%'
-      // ..style.height = '50px'
-      ..style.zIndex = '10000'
-      ..style.backgroundColor = "green"
-      ..innerText = 'Hier ist das AR DOM Overlay!';
-
-    xrOverlay.children.add(overlay);
-
-    html.ButtonElement closeButton = html.ButtonElement()
+    html.DivElement closeButton = html.DivElement()
       ..id = 'close-button'
-      ..style.position = 'absolute'
-      ..style.top = '15px'
-      ..style.right = '15px'
-      ..style.zIndex = '10000'
-      ..style.padding = '6px'
+      ..style.position = 'fixed'
+      ..style.bottom = '10% '
+      ..style.left = '50%'
+      ..style.transform = 'translateX(-50%)'
+      ..style.zIndex = '100000'
+      ..style.padding = '6px 12px'
       ..style.backgroundColor = "white"
+      ..style.border = 'none'
       ..style.borderRadius = '12px'
-      ..style.borderColor = "transparent"
       ..innerText = 'Close Session';
 
-    xrOverlay.children.add(closeButton);
-
-    // add main container to document body
-    html.document.body?.children.add(xrOverlay);
+    // add button to document body
+    html.document.body!.children.add(closeButton);
 
     closeButton.onClick.listen((event) {
       endSession();
+      sceneController.scene.clear();
       closeButton.remove();
-      overlay.remove();
-    });
-
-    overlay.onClick.listen((event) {
-      // addElement1();
-      // rendererController.render();
     });
 
     return {
       'optionalFeatures': ['dom-overlay'],
       'domOverlay': {
-        'root': html.document.getElementById('ar-overlay'),
+        'root': html.document.getElementById('close-button'),
       }
     };
   }

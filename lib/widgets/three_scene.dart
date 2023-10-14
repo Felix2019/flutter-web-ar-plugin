@@ -24,7 +24,6 @@ class _ThreeSceneState extends State<ThreeScene> {
   final html.CanvasElement canvas = html.CanvasElement();
 
   late RendererController rendererController;
-
   final SceneController sceneController = SceneController();
   final CameraController cameraController =
       CameraController(matrixAutoUpdate: true);
@@ -35,50 +34,51 @@ class _ThreeSceneState extends State<ThreeScene> {
     super.initState();
     rendererController = RendererController(canvas: canvas);
 
-    registerCanvas();
-    configureCamera();
-    addElement();
-    animate();
+    _registerCanvas();
+    _configureCamera();
+    _loadAndAddElementToScene();
   }
 
-  void registerCanvas() {
+  /// Registers the canvas element to be used as a platform view.
+  void _registerCanvas() {
     // Register div as a view and ensure the div is ready before we try to use it
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry
         .registerViewFactory(widget.createdViewId, (int viewId) => canvas);
   }
 
-  void configureCamera() {
+  /// Sets the camera position.
+  void _configureCamera() {
     cameraController.setPosition(null, null, 6);
   }
 
-  Future<void> addElement() async {
-    if (widget.object != null) sceneController.addElement(widget.object!);
+  /// Loads the model and adds it to the scene.
+  Future<void> _loadAndAddElementToScene() async {
+    if (widget.object == null && widget.path == null) {
+      throw Exception('You can only pass either an object or a path');
+    }
+
+    if (widget.object != null) {
+      sceneController.addElement(widget.object!);
+      _startAnimation(widget.object, 0.04, 0.04);
+      return;
+    }
 
     if (widget.path != null) {
       try {
-        Future.delayed(const Duration(seconds: 1), () async {
-          domLog('Loading model...');
-
-          dynamic model =
-              await loaderController.loadModel('./models/shiba/scene.gltf');
-
-          sceneController.addElement(model);
-
-          rendererController.animate(sceneController.scene,
-              cameraController.perspectiveCamera, model, 0, 0.04);
-        });
+        final model = await loaderController.loadModel(widget.path!);
+        sceneController.addElement(model);
+        _startAnimation(model, 0, 0.04);
       } catch (error) {
-        domLog(error);
+        domLog('Error loading model: $error');
       }
     }
   }
 
-  void animate() {
-    if (widget.object == null) return;
-    rendererController.animate(sceneController.scene,
-        cameraController.perspectiveCamera, widget.object!, 0.04, 0.04);
-  }
+  /// Starts the animation of the object in the scene.
+  void _startAnimation(dynamic model, double x, double y) =>
+      rendererController.animate(sceneController.scene,
+          cameraController.perspectiveCamera, model, x, y);
 
   @override
   Widget build(BuildContext context) {
