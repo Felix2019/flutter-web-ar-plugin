@@ -1,3 +1,5 @@
+import 'dart:js_util';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
 import 'package:flutter_web_xr/widgets/three_model.dart';
@@ -25,6 +27,7 @@ class _HomeState extends State<Home> {
 
   List<ThreeModel> _initializeModels() {
     return [
+      // cube model
       ThreeModel(
         name: 'Cube',
         startARSession: () async {
@@ -36,6 +39,7 @@ class _HomeState extends State<Home> {
           object: _flutterWebXrPlugin.createCube(sideLength: 1),
         ),
       ),
+      // cone model
       ThreeModel(
           name: 'Cone',
           startARSession: () async {
@@ -46,6 +50,18 @@ class _HomeState extends State<Home> {
             createdViewId: 'cone',
             object: _flutterWebXrPlugin.createCone(radius: 0.6, height: 0.8),
           )),
+      // heart model
+      ThreeModel(
+          name: 'Heart',
+          startARSession: () async {
+            await startXRSession(context,
+                () => _flutterWebXrPlugin.createHeart(color: 0xff3333));
+          },
+          scene: ThreeScene(
+            createdViewId: 'heart',
+            object: _flutterWebXrPlugin.createHeart(color: 0xff3333),
+          )),
+      // gltf model
       ThreeModel(
           name: 'Shiba',
           startARSession: () async {
@@ -76,9 +92,7 @@ class _HomeState extends State<Home> {
       createObject();
       await _flutterWebXrPlugin.startSession();
     } catch (e) {
-      _flutterWebXrPlugin.jsPrint("err");
-      _showErrorSnackBar(context, e.toString());
-      // _showErrorSnackBar(context, 'Failed to start web xr session');
+      _showErrorSnackBar(context, 'Failed to start web xr session');
     }
   }
 

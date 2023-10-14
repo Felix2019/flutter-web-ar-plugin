@@ -45,7 +45,8 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("endSession() has not been implemented.");
   }
 
-  Mesh createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
+  Mesh createObject(dynamic geometry,
+      [List<MeshBasicMaterial>? materials, Map<String, dynamic>? options]) {
     throw UnimplementedError("createObject() has not been implemented.");
   }
 
@@ -61,6 +62,10 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
     throw UnimplementedError("createCone() has not been implemented.");
   }
 
+  Mesh createHeart({required int color}) {
+    throw UnimplementedError("createHeart() has not been implemented.");
+  }
+
   Future<void> loadGLTFModel(String path) async {
     throw UnimplementedError("loadGLTFModel() has not been implemented.");
   }
@@ -71,9 +76,5 @@ abstract class FlutterWebXrPlatform extends PlatformInterface {
 
   void openWindow(String url) {
     throw UnimplementedError("openWindow() has not been implemented.");
-  }
-
-  void test() {
-    throw UnimplementedError("test() has not been implemented.");
   }
 }

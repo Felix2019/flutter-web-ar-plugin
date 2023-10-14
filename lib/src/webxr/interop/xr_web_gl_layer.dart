@@ -1,9 +1,10 @@
 import 'package:flutter_web_xr/src/webxr/interop/xr_frame.dart';
+import 'package:flutter_web_xr/src/webxr/interop/xr_session.dart';
 import 'package:js/js.dart';
 
 @JS('XRWebGLLayer')
 class XRWebGLLayer {
-  external XRWebGLLayer(Object? session, Object? context);
+  external XRWebGLLayer(XRSession session, Object? context);
 
   external getViewport(XRFrame view);
   external get context;

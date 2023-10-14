@@ -12,13 +12,13 @@ class ThreeUtils {
         MeshBasicMaterial(jsify({'color': 0xffff00}))
       ];
 
-  static Mesh createCube({required double sideLength}) {
-    final geometry = BoxGeometry(sideLength, sideLength, sideLength);
-    return Mesh(geometry, createMaterials());
-  }
+  // static Mesh createCube({required double sideLength}) {
+  //   final geometry = BoxGeometry(sideLength, sideLength, sideLength);
+  //   return Mesh(geometry, createMaterials());
+  // }
 
-  static Mesh createCone({required double radius, required double height}) {
-    final geometry = ConeGeometry(radius, height, 32);
-    return Mesh(geometry, createMaterials());
-  }
+  // static Mesh createCone({required double radius, required double height}) {
+  //   final geometry = ConeGeometry(radius, height, 32);
+  //   return Mesh(geometry, createMaterials());
+  // }
 }

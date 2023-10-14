@@ -67,6 +67,7 @@ class _ThreeSceneState extends State<ThreeScene> {
     if (widget.path != null) {
       try {
         final model = await loaderController.loadModel(widget.path!);
+
         sceneController.addElement(model);
         _startAnimation(model, 0, 0.04);
       } catch (error) {

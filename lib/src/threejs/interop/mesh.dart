@@ -14,16 +14,15 @@ class Mesh {
   external Mesh(dynamic geometry, List<MeshBasicMaterial> material);
   external Rotation get rotation;
   external Scale get scale;
-  external Position get position;
-  external set position(Position value);
+  external Vector3 get position;
+  external set position(Vector3 value);
 }
 
-@JS('BoxGeometry')
-class BoxGeometry {
-  external BoxGeometry(num width, num height, num depth);
-}
-
-@JS('ConeGeometry')
-class ConeGeometry {
-  external ConeGeometry(num radius, num height, num radialSegments);
+@JS('Shape')
+class Shape {
+  external Shape();
+  external void moveTo(double x, double y);
+  external void lineTo(double x, double y);
+  external void bezierCurveTo(
+      double x1, double y1, double x2, double y2, double x, double y);
 }

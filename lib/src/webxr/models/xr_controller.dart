@@ -1,9 +1,7 @@
 import 'dart:html' as html;
 import 'dart:js_util';
 
-import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
-import 'package:flutter_web_xr/src/threejs/interop/transformations.dart';
 import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';

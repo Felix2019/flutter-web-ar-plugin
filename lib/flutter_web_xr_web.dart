@@ -5,6 +5,7 @@
 
 import 'dart:html' as html;
 import 'package:flutter_web_xr/battery_manager.dart';
+import 'package:flutter_web_xr/src/threejs/interop/geometries.dart';
 import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
 import 'package:flutter_web_xr/src/threejs/models/loader_controller.dart';
@@ -95,12 +96,21 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
   }
 
   @override
-  Mesh createObject(dynamic geometry, [List<MeshBasicMaterial>? materials]) {
-    final Mesh object =
+  Mesh createObject(dynamic geometry,
+      [List<MeshBasicMaterial>? materials, Map<String, dynamic>? options]) {
+    final dynamic object =
         Mesh(geometry, materials ?? ThreeUtils.createMaterials());
     object.position.z = -1;
     object.rotation.x += 7;
     object.rotation.y += 7;
+
+    if (options != null) {
+      print(options['scale']);
+      if (options['scale'] != null) {
+        object.scale.set(options['scale']['x'], options['scale']['y'],
+            options['scale']['z']);
+      }
+    }
 
     sceneController.addElement(object);
     return object;
@@ -120,32 +130,41 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
       required double height,
       List<MeshBasicMaterial>? materials}) {
     final ConeGeometry geometry = ConeGeometry(radius, height, 32);
+
     return createObject(geometry, materials);
   }
 
-  void multiplyObject() {
-    const rowCount = 4;
-    const half = rowCount / 2;
+  @override
+  Mesh createHeart({required int color}) {
+    final Shape shape = Shape();
+    shape.moveTo(25, 25);
+    shape.bezierCurveTo(25, 25, 20, 0, 0, 0);
+    shape.bezierCurveTo(-30, 0, -30, 35, -30, 35);
+    shape.bezierCurveTo(-30, 55, -10, 77, 25, 95);
+    shape.bezierCurveTo(60, 77, 80, 55, 80, 35);
+    shape.bezierCurveTo(80, 35, 80, 0, 50, 0);
+    shape.bezierCurveTo(35, 0, 25, 25, 25, 25);
 
-    final BoxGeometry geometry = BoxGeometry(0.2, 0.2, 0.2);
-    final List<MeshBasicMaterial> materials = ThreeUtils.createMaterials();
+    final Map<String, dynamic> extrudeSettings = {
+      "depth": 8,
+      "bevelEnabled": true,
+      "bevelSegments": 2,
+      "steps": 2,
+      "bevelSize": 1,
+      "bevelThickness": 1
+    };
 
-    for (var i = 0; i < rowCount; i++) {
-      for (var j = 0; j < rowCount; j++) {
-        for (var k = 0; k < rowCount; k++) {
-          final Mesh object = Mesh(geometry, materials);
+    final MeshBasicMaterial material =
+        MeshBasicMaterial(jsify({'color': color}));
 
-          object.position.x = i - half;
-          object.position.y = j - half;
-          object.position.z = k - half;
+    final Map<String, dynamic> options = {
+      'scale': {'x': 0.01, 'y': 0.01, 'z': 0.01}
+    };
 
-          object.rotation.x += 7;
-          object.rotation.y += 7;
+    final ExtrudeGeometry geometry =
+        ExtrudeGeometry(shape, jsify(extrudeSettings));
 
-          sceneController.addElement(object);
-        }
-      }
-    }
+    return createObject(geometry, [material], options);
   }
 
   @override
@@ -175,10 +194,12 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     try {
       dynamic model = await loaderController.loadModel(path);
 
+      model.scale.set(0.5, 0.5, 0.5);
+      model.position.z = -1;
       sceneController.addElement(model);
 
-      rendererController.animate(sceneController.scene,
-          cameraController.perspectiveCamera, model, 0, 0.04);
+      rendererController.render(
+          sceneController.scene, cameraController.perspectiveCamera);
     } catch (e) {
       throw Exception('Failed to load gltf model');
     }
@@ -186,9 +207,6 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
 
   @override
   void openWindow(String url) => html.window.open(url, '_blank');
-
-  @override
-  void test() {}
 
   /// Retrieves the battery level of the device.
   ///

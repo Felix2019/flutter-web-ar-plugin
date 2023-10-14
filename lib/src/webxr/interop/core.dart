@@ -25,16 +25,3 @@ class XRRigidTransform {
   external get orientation;
   external List<double> matrix;
 }
-
-// not used currently
-@JS()
-class XR {
-  external bool get enabled;
-  external set enabled(bool value);
-
-  external bool get isPresenting;
-  external set isPresenting(bool value);
-
-  external XRSession getSession();
-  external dynamic getController(num index);
-}

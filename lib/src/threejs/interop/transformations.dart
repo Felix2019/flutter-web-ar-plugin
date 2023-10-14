@@ -1,13 +1,16 @@
 @JS('THREE')
 library transformations;
 
+import 'package:flutter_web_xr/src/threejs/interop/utilities.dart';
 import 'package:js/js.dart';
 
 @JS('Vector3')
-class Position {
-  external factory Position(num x, num y, num z);
+class Vector3 {
+  external factory Vector3(num x, num y, num z);
+  external dynamic set(num x, num y, num z);
+  external void multiplyScalar(num scalar);
 
-  external set position(Position value);
+  external set position(Vector3 value);
 
   external double get x;
   external set x(double value);
@@ -18,10 +21,10 @@ class Position {
   external double get z;
   external set z(double value);
 
-  external setFromMatrixPosition(dynamic xrPosition);
+  external setFromMatrixPosition(Matrix4 xrPosition);
 }
 
-extension on Position {
+extension on Vector3 {
   external int field;
   external int get getSet;
   external set getSet1(int val);
