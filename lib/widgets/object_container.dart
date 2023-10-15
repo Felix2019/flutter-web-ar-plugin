@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_xr/src/utils/theme.dart';
 import 'package:flutter_web_xr/widgets/three_model.dart';
 
+/// `ObjectContainer` is a widget that displays a 3D model within a decorative container.
+///
+/// The primary purpose of this widget is to present a 3D model along with an associated name
+/// and a start button for an AR session.
 class ObjectContainer extends StatelessWidget {
+  // The 3D model that is to be displayed within this container.
   final ThreeModel model;
 
+  /// Creates an instance of [ObjectContainer].
   const ObjectContainer({super.key, required this.model});
 
   @override
@@ -18,9 +24,9 @@ class ObjectContainer extends StatelessWidget {
           borderRadius: CustomTheme.borderRadius),
       child: Stack(
         children: [
-          // three model
+          // Displaying the 3D model.
           model.scene,
-          // model name
+          // Chip widget displaying the name of the 3D model.
           Align(
             alignment: Alignment.topCenter,
             child: Chip(
@@ -30,7 +36,7 @@ class ObjectContainer extends StatelessWidget {
               label: Text(model.name, maxLines: 1),
             ),
           ),
-          // start button
+          // Start button for initiating the AR session.
           Align(
             alignment: Alignment.bottomCenter,
             child: Row(

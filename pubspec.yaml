@@ -3,6 +3,8 @@ description: A new Flutter plugin project.
 version: 0.0.1
 homepage:
 
+Erstelle eine Inline-Dokumentation auf Englisch für folgenden Code:
+
 environment:
   sdk: '>=3.0.5 <4.0.0'
   flutter: ">=3.3.0"
@@ -13,9 +15,6 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   js: ^0.6.7
-  three_dart: ^0.0.16
-  flutter_gl: ^0.0.21
-  # flutter_web_gl: ^0.0.1-nullsafety.0
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:

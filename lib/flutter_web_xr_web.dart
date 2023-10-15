@@ -33,6 +33,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
       CameraController(matrixAutoUpdate: false);
   final LoaderController loaderController = LoaderController();
 
+  /// Constructor for `FlutterWebXrWeb`. Initializes XRController and other members.
   FlutterWebXrWeb() {
     try {
       rendererController = RendererController(canvas: canvas);
@@ -44,6 +45,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     }
   }
 
+  /// Register this web platform implementation.
   static void registerWith(Registrar registrar) {
     FlutterWebXrPlatform.instance = FlutterWebXrWeb();
   }
@@ -64,13 +66,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
       userAgent.toLowerCase().contains('chrome') ||
       userAgent.toLowerCase().contains('edg');
 
-  // The viewport is less than 768 pixels wide
-  /// Determines if the current device is a mobile device based on its width.
-  ///
-  /// This method checks the window's width and considers any device
-  /// with a width of 767 pixels or less to be a mobile device.
-  ///
-  /// @return `true` if the device is mobile (width <= 767px), otherwise `false`.
+  /// Checks if the viewport is less than 768 pixels wide indicating a mobile device.
   bool isMobileDevice() => html.window.matchMedia("(max-width: 767px)").matches;
 
   /// Checks if WebXR is available and compatible on the current platform.
@@ -88,6 +84,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     return checkRequirements();
   }
 
+  /// Helper function to check browser compatibility and device requirements.
   bool checkRequirements() {
     String userAgent = getPlatformVersion() ?? 'Unknown platform version';
 
@@ -95,6 +92,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     return isCompatible;
   }
 
+  /// Creates and returns a mesh object with the specified geometry and materials.
   @override
   Mesh createObject(dynamic geometry,
       [List<MeshBasicMaterial>? materials, Map<String, dynamic>? options]) {
@@ -105,7 +103,6 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     object.rotation.y += 7;
 
     if (options != null) {
-      print(options['scale']);
       if (options['scale'] != null) {
         object.scale.set(options['scale']['x'], options['scale']['y'],
             options['scale']['z']);
@@ -116,6 +113,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     return object;
   }
 
+  /// Creates and returns a cube mesh.
   @override
   Mesh createCube(
       {required double sideLength, List<MeshBasicMaterial>? materials}) {
@@ -124,6 +122,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     return createObject(geometry, materials);
   }
 
+  /// Creates and returns a cone mesh.
   @override
   Mesh createCone(
       {required double radius,
@@ -134,6 +133,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     return createObject(geometry, materials);
   }
 
+  /// Creates and returns a heart-shaped mesh.
   @override
   Mesh createHeart({required int color}) {
     final Shape shape = Shape();
@@ -167,6 +167,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     return createObject(geometry, [material], options);
   }
 
+  /// Initiates a WebXR session.
   @override
   Future<void> startSession() async {
     try {
@@ -177,6 +178,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     }
   }
 
+  /// Ends a WebXR session.
   @override
   Future<void> endSession() async {
     try {
@@ -186,9 +188,7 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     }
   }
 
-  @override
-  void jsPrint(dynamic message) => domLog(message);
-
+  /// Loads a GLTF model from the specified path and adds it to the scene.
   @override
   Future<void> loadGLTFModel(String path) async {
     try {
@@ -205,8 +205,13 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
     }
   }
 
+  /// Opens a new browser window/tab with the specified URL.
   @override
   void openWindow(String url) => html.window.open(url, '_blank');
+
+  /// Prints a message to the JavaScript console.
+  @override
+  void jsPrint(dynamic message) => domLog(message);
 
   /// Retrieves the battery level of the device.
   ///
@@ -238,16 +243,4 @@ class FlutterWebXrWeb extends FlutterWebXrPlatform {
       throw Exception('Failed to fetch battery level');
     }
   }
-
-  //  void render() {
-  //   final List<Mesh> activeObjects = sceneController.activeObjects;
-
-  //   for (var i = 0; i < activeObjects.length; i++) {
-  //     final Mesh object = activeObjects[i];
-  //     meshController.rotateObject(object, xValue: 0.03, yValue: 0.03);
-  //   }
-
-  //   rendererController.render(
-  //       sceneController.scene, cameraController.perspectiveCamera);
-  // }
 }

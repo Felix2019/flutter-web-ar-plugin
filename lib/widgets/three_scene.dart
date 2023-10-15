@@ -8,11 +8,19 @@ import 'package:flutter_web_xr/src/utils/interop_utils.dart';
 import 'dart:html' as html;
 import 'dart:ui' as ui;
 
+/// `ThreeScene` is a widget that integrates 3D models into a Flutter application using Three.js.
+/// It can either display a provided 3D mesh object directly or load a 3D model from a provided path.
 class ThreeScene extends StatefulWidget {
+  /// A unique ID associated with the view created for displaying the 3D model.
   final String createdViewId;
+
+  /// An optional mesh object to be displayed within the scene.
   final Mesh? object;
+
+  /// An optional path to a 3D model that should be loaded and displayed.
   final String? path;
 
+  /// Constructs an instance of `ThreeScene`.
   const ThreeScene(
       {super.key, required this.createdViewId, this.object, this.path});
 
@@ -21,12 +29,20 @@ class ThreeScene extends StatefulWidget {
 }
 
 class _ThreeSceneState extends State<ThreeScene> {
+  /// HTML canvas element where the 3D scene will be rendered.
   final html.CanvasElement canvas = html.CanvasElement();
 
+  /// Controller responsible for rendering the 3D scene.
   late RendererController rendererController;
+
+  /// Controller for managing the 3D scene.
   final SceneController sceneController = SceneController();
+
+  /// Controller for handling camera-related operations.
   final CameraController cameraController =
       CameraController(matrixAutoUpdate: true);
+
+  /// Controller to assist with loading 3D models.
   final LoaderController loaderController = LoaderController();
 
   @override
@@ -39,7 +55,7 @@ class _ThreeSceneState extends State<ThreeScene> {
     _loadAndAddElementToScene();
   }
 
-  /// Registers the canvas element to be used as a platform view.
+  /// Registers the canvas to be used within Flutter's platform view system.
   void _registerCanvas() {
     // Register div as a view and ensure the div is ready before we try to use it
     // ignore: undefined_prefixed_name
@@ -47,12 +63,13 @@ class _ThreeSceneState extends State<ThreeScene> {
         .registerViewFactory(widget.createdViewId, (int viewId) => canvas);
   }
 
-  /// Sets the camera position.
+  /// Configures the camera's position within the 3D scene.
   void _configureCamera() {
     cameraController.setPosition(null, null, 6);
   }
 
-  /// Loads the model and adds it to the scene.
+  /// If an object is provided, adds it directly to the scene. Otherwise, loads a 3D model from the specified path
+  /// and then adds it to the scene.
   Future<void> _loadAndAddElementToScene() async {
     if (widget.object == null && widget.path == null) {
       throw Exception('You can only pass either an object or a path');
