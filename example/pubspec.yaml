@@ -26,8 +26,6 @@ dependencies:
     path: ../
 
   cupertino_icons: ^1.0.2
-  three_dart: ^0.0.16
-  flutter_gl: ^0.0.21
   js: ^0.6.7
 
 dev_dependencies:

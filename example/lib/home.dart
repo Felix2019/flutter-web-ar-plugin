@@ -1,12 +1,11 @@
+import 'dart:js_util';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_web_xr/flutter_web_xr.dart';
-import 'package:flutter_web_xr/widgets/cube_scene.dart';
-import 'package:flutter_web_xr/widgets/three_canvas.dart';
+import 'package:flutter_web_xr/widgets/three_model.dart';
+import 'package:flutter_web_xr/widgets/three_scene.dart';
 import 'package:flutter_web_xr_example/battery_page.dart';
-import 'package:js/js.dart';
-
-@JS()
-external void createAlert(String message);
+import 'package:flutter_web_xr/widgets/object_grid.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,17 +15,91 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final _flutterWebXrPlugin = FlutterWebXr();
+  final FlutterWebXr _flutterWebXrPlugin = FlutterWebXr();
 
-  bool startAR = false;
+  late List<ThreeModel> models;
 
-  Future<bool> isWebXrSupported() async {
+  @override
+  void initState() {
+    super.initState();
+    models = _initializeModels();
+  }
+
+  List<ThreeModel> _initializeModels() {
+    return [
+      // cube model
+      ThreeModel(
+        name: 'Cube',
+        startARSession: () async {
+          await startXRSession(
+              context, () => _flutterWebXrPlugin.createCube(sideLength: 0.2));
+        },
+        scene: ThreeScene(
+          createdViewId: 'cube',
+          object: _flutterWebXrPlugin.createCube(sideLength: 1),
+        ),
+      ),
+      // cone model
+      ThreeModel(
+          name: 'Cone',
+          startARSession: () async {
+            await startXRSession(context,
+                () => _flutterWebXrPlugin.createCone(radius: 0.2, height: 0.6));
+          },
+          scene: ThreeScene(
+            createdViewId: 'cone',
+            object: _flutterWebXrPlugin.createCone(radius: 0.6, height: 0.8),
+          )),
+      // heart model
+      ThreeModel(
+          name: 'Heart',
+          startARSession: () async {
+            await startXRSession(context,
+                () => _flutterWebXrPlugin.createHeart(color: 0xff3333));
+          },
+          scene: ThreeScene(
+            createdViewId: 'heart',
+            object: _flutterWebXrPlugin.createHeart(color: 0xff3333),
+          )),
+      // gltf model
+      ThreeModel(
+          name: 'Shiba',
+          startARSession: () async {
+            await startXRSession(
+                context,
+                () async => await _flutterWebXrPlugin
+                    .loadGLTFModel('models/shiba/scene.gltf'));
+          },
+          scene: const ThreeScene(
+            createdViewId: 'gltfObject',
+            path: 'models/shiba/scene.gltf',
+          )),
+    ];
+  }
+
+  bool isWebXrSupported(BuildContext context) {
     try {
-      final bool result = await _flutterWebXrPlugin.isWebXrAvailable();
-      return result;
+      return _flutterWebXrPlugin.isWebXrAvailable();
     } catch (e) {
-      throw Exception('Failed to check web xr availability');
+      _showErrorSnackBar(context, 'Failed to check web xr availability');
+      return false;
     }
+  }
+
+  Future<void> startXRSession(
+      BuildContext context, Function createObject) async {
+    try {
+      createObject();
+      await _flutterWebXrPlugin.startSession();
+    } catch (e) {
+      _showErrorSnackBar(context, 'Failed to start web xr session');
+    }
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -34,6 +107,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Flutter Web AR Plugin'),
+          scrolledUnderElevation: 0,
           actions: [
             IconButton.filledTonal(
                 onPressed: () {
@@ -44,50 +118,18 @@ class _HomeState extends State<Home> {
                               pluginInstance: _flutterWebXrPlugin)));
                 },
                 icon: const Icon(Icons.battery_charging_full)),
-            const SizedBox(width: 20),
+            const SizedBox(width: 15),
             IconButton.filledTonal(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CubeScene()));
+                  _flutterWebXrPlugin.openWindow(
+                      'https://github.com/Felix2019/flutter-web-ar-plugin');
                 },
-                icon: const Icon(Icons.video_collection)),
-            const SizedBox(width: 20)
+                icon: const Icon(Icons.code)),
+            const SizedBox(width: 15),
           ],
         ),
-        body: FutureBuilder<bool>(
-          future: isWebXrSupported(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text(snapshot.error.toString()));
-            } else {
-              if (snapshot.data == true) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () async {
-                            setState(() {
-                              startAR = true;
-                            });
-                          },
-                          child: const Text("start ar session")),
-                      startAR ? const MyCanvasTest() : const SizedBox(),
-                    ],
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: Text('WebXR not supported'),
-                );
-              }
-            }
-          },
-        ));
+        body: isWebXrSupported(context)
+            ? ObjectGrid(models: models)
+            : const Center(child: Text('WebXR not supported')));
   }
 }
