@@ -1,9 +1,9 @@
 import 'package:flutter_web_xr/src/threejs/interop/mesh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
-import 'package:flutter_web_xr/src/threejs/models/loader_controller.dart';
-import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
-import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/camera_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/loader_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/renderer_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/scene_controller.dart';
 import 'package:flutter_web_xr/src/utils/interop_utils.dart';
 import 'dart:html' as html;
 import 'dart:ui' as ui;

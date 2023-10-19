@@ -4,7 +4,7 @@ import 'package:flutter_web_xr/src/threejs/interfaces/renderer_operations.dart';
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
 import 'dart:html' as html;
 
-import 'package:flutter_web_xr/src/threejs/models/object_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/object_controller.dart';
 
 class RendererController implements RendererOperations {
   final html.CanvasElement canvas;

@@ -2,9 +2,9 @@ import 'dart:html' as html;
 import 'dart:js_util';
 
 import 'package:flutter_web_xr/src/threejs/interop/rendering.dart';
-import 'package:flutter_web_xr/src/threejs/models/camera_controller.dart';
-import 'package:flutter_web_xr/src/threejs/models/renderer_controller.dart';
-import 'package:flutter_web_xr/src/threejs/models/scene_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/camera_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/renderer_controller.dart';
+import 'package:flutter_web_xr/src/threejs/controllers/scene_controller.dart';
 import 'package:flutter_web_xr/src/webxr/interop/core.dart';
 import 'package:flutter_web_xr/src/webxr/interop/xr_frame.dart';
 import 'package:flutter_web_xr/src/webxr/interop/xr_render_state.dart';
